@@ -10,7 +10,8 @@ class SmartShopApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'SmartShop',
+      title: 'FruitSmart',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
@@ -24,28 +25,72 @@ class SmartShopApp extends StatelessWidget {
 }
 
 class Product {
+  final String id; // Add an id field
   final String name;
   final String description;
   final String image;
+  final double price; // Assuming you have a price field
 
-  Product({required this.name, required this.description, required this.image});
+  Product({
+    required this.id, // Make sure to pass this when creating a product
+    required this.name,
+    required this.description,
+    required this.image,
+    required this.price,
+  });
 }
+
+class CartItem {
+  final Product product;
+  int quantity;
+  CartItem({required this.product, this.quantity = 1});
+}
+
+List<Product> cartItems = [];
 
 final List<Product> products = [
   Product(
-      name: 'Semangka',
-      description: 'Buah Semangka',
+      id: '1',
+      price: 15000,
+      name: 'Anggur',
+      description: 'Buah Anggur',
       image: 'assets/img/1.jpg'),
-  Product(name: 'Kiwi', description: 'Buah Kiwi', image: 'assets/img/2.jpg'),
-  Product(name: 'Apel', description: 'Buah Apel', image: 'assets/img/3.jpg'),
-  Product(name: 'Pir', description: 'Buah Pir', image: 'assets/img/4.jpg'),
   Product(
-      name: 'Jeruk Limau?',
-      description: 'Buah Jeruk Limau',
-      image: 'assets/img/5.jpg'),
+      id: '2',
+      price: 25000,
+      name: 'Apel',
+      description: 'Buah Apel',
+      image: 'assets/img/2.jpg'),
   Product(
-      name: 'Manggis', description: 'Buah Manggis', image: 'assets/img/6.jpg'),
-  Product(name: 'Jeruk', description: 'Buah Jeruk', image: 'assets/img/7.jpg'),
+      id: '3',
+      price: 15000,
+      name: 'Naga',
+      description: 'Buah Naga',
+      image: 'assets/img/3.jpg'),
+  Product(
+      id: '4',
+      price: 15000,
+      name: 'Kelengkeng',
+      description: 'Buah Kelengkeng',
+      image: 'assets/img/4.jpg'),
+  Product(
+      id: '5',
+      price: 15000,
+      name: 'Melon',
+      description: 'Buah Melon',
+      image: 'assets/img/5.png'),
+  Product(
+      id: '6',
+      price: 15000,
+      name: 'Nanas',
+      description: 'Buah Nanas',
+      image: 'assets/img/6.jpg'),
+  Product(
+      id: '7',
+      price: 15000,
+      name: 'Strawberry',
+      description: 'Buah Strawberry',
+      image: 'assets/img/7.jpg'),
 ];
 
 class HomeScreen extends StatelessWidget {
@@ -56,40 +101,56 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('SmartShop'),
+        title: const Text('FruitSmart'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.shopping_cart),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const CartScreen()),
+              );
+            },
+          ),
+        ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text(
-              'Selamat Datang di SmartShop!',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-            const Text(
-              'Belanja produk elektronik terbaik dengan harga terjangkau.',
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(
-                height: 40), // Jarak lebih jauh antara teks dan gambar
-            Image.network(
-              'https://media.istockphoto.com/id/1253516957/id/vektor/belanja-online-dan-template-e-commerce-dengan-ilustrasi-vektor-kartun-orang.jpg?s=170667a&w=0&k=20&c=BhfXJwJWuOaJbBkOCDkTYrSjg4hPq3ngA-x8tz3vxJY=',
-              fit: BoxFit.contain,
-              height: 200,
-            ),
-            const SizedBox(height: 30), // Jarak di bawah gambar
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pushNamed(context, '/product-list');
-              },
-              style: ElevatedButton.styleFrom(
-                foregroundColor: Colors.white,
-                backgroundColor: Colors.blue, // Warna teks tombol
+      body: Center(
+        // Center digunakan untuk menengahkan konten
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment
+                .center, // Konten juga di tengah secara horizontal
+            children: [
+              const Text(
+                'Selamat Datang di FruitSmart!',
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
-              child: const Text('Belanja Sekarang'),
-            ),
-          ],
+              const Text(
+                'Belanja produk buah-buahan terbaik dengan harga terjangkau.',
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(
+                  height: 40), // Jarak lebih jauh antara teks dan gambar
+              Image.network(
+                'https://media.istockphoto.com/id/1253516957/id/vektor/belanja-online-dan-template-e-commerce-dengan-ilustrasi-vektor-kartun-orang.jpg?s=170667a&w=0&k=20&c=BhfXJwJWuOaJbBkOCDkTYrSjg4hPq3ngA-x8tz3vxJY=',
+                fit: BoxFit.contain,
+                height: 200,
+              ),
+              const SizedBox(height: 30), // Jarak di bawah gambar
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pushNamed(context, '/product-list');
+                },
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: Colors.white,
+                  backgroundColor: Colors.blue, // Warna teks tombol
+                ),
+                child: const Text('Belanja Sekarang'),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -161,8 +222,19 @@ class ProductDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Product product =
-        ModalRoute.of(context)!.settings.arguments as Product;
+    final Product? product =
+        ModalRoute.of(context)!.settings.arguments as Product?;
+
+    if (product == null) {
+      return Scaffold(
+        appBar: AppBar(
+          title: const Text('Product Detail'),
+        ),
+        body: const Center(
+          child: Text('Product not found.'),
+        ),
+      );
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -170,21 +242,116 @@ class ProductDetailScreen extends StatelessWidget {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Image.network(product.image,
-                height: 200, width: double.infinity, fit: BoxFit.cover),
-            const SizedBox(height: 16),
-            Text(
-              product.name,
-              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8),
-            Text(product.description),
-          ],
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Image.network(
+                    product.image,
+                    height: constraints.maxWidth > 600 ? 300 : 200,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    product.name,
+                    style: const TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    product.description,
+                    style: const TextStyle(fontSize: 16),
+                  ),
+                  const SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: () {
+                      // Add product to cart
+                      cart.add(product);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('${product.name} added to cart!'),
+                        ),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue,
+                    ),
+                    child: const Text(
+                      'Add to Cart',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
         ),
       ),
+    );
+  }
+}
+
+class Cart {
+  List<CartItem> items = [];
+
+  void add(Product product) {
+    // Check if the product is already in the cart
+    final existingItem = items.firstWhere(
+      (item) => item.product.id == product.id, // Ensure Product has 'id'
+      orElse: () => CartItem(
+          product: product, quantity: 0), // Return a default item if not found
+    );
+
+    if (existingItem.quantity > 0) {
+      // If exists, increase the quantity
+      existingItem.quantity++;
+    } else {
+      // If not, add a new item
+      items.add(CartItem(product: product));
+    }
+  }
+
+  void clear() {
+    items.clear();
+  }
+}
+
+// Create an instance of Cart
+final Cart cart = Cart(); // Rename cart variable to avoid conflict
+
+class CartScreen extends StatelessWidget {
+  const CartScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    // Get the cart items from the provider (or state management)
+    final cartItems =
+        cart.items; // Assuming you have a cart object that manages the cart
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Cart'),
+      ),
+      body: cartItems.isEmpty
+          ? const Center(child: Text('Your cart is empty.'))
+          : ListView.builder(
+              itemCount: cartItems.length,
+              itemBuilder: (context, index) {
+                final item = cartItems[index];
+                return ListTile(
+                  leading: Image.network(item.product.image),
+                  title: Text(item.product.name),
+                  subtitle: Text('Quantity: ${item.quantity}'),
+                  trailing:
+                      Text('Price: \$${item.product.price * item.quantity}'),
+                );
+              },
+            ),
     );
   }
 }
