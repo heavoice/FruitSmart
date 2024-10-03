@@ -57,7 +57,7 @@ final List<Product> products = [
       image: 'assets/img/1.jpg'),
   Product(
       id: '2',
-      price: 25000,
+      price: 15000,
       name: 'Apel',
       description: 'Buah Apel',
       image: 'assets/img/2.jpg'),
