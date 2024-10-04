@@ -268,24 +268,28 @@ class ProductDetailScreen extends StatelessWidget {
                     style: const TextStyle(fontSize: 16),
                   ),
                   const SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: () {
-                      // Add product to cart
-                      cart.add(product);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('${product.name} added to cart!'),
+                  Center(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        // Add product to cart
+                        cart.add(product);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('${product.name} added to cart!'),
+                          ),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blue,
+                      ),
+                      child: const Text(
+                        'Add to Cart',
+                        style: TextStyle(
+                          color: Colors.white,
                         ),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue,
+                      ),
                     ),
-                    child: const Text(
-                      'Add to Cart',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  ),
+                  )
                 ],
               ),
             );
