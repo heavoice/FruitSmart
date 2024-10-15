@@ -205,58 +205,62 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                             )
                           ],
                         ),
-                        Row(
-                          children: [
-                            SizedBox(
-                              width: 52,
-                              height: 52,
-                              child: TextButton(
-                                onPressed: () {},
-                                style: TextButton.styleFrom(
-                                  backgroundColor: Colors.white,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                    side: BorderSide(
-                                      width: 2,
-                                      color: Color(int.parse(
-                                          '0xFF${product.secondaryColor}')),
-                                    ),
-                                  ),
-                                ),
-                                child: Icon(
-                                  CupertinoIcons.heart_fill,
-                                  color: Color(int.parse(
-                                      '0xFF${product.secondaryColor}')),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 20),
-                            Expanded(
-                              child: SizedBox(
+                        Padding(
+                          padding: const EdgeInsets.only(top: 30),
+                          child: Row(
+                            children: [
+                              SizedBox(
                                 width: 52,
                                 height: 52,
                                 child: TextButton(
-                                    onPressed: () {},
-                                    style: TextButton.styleFrom(
-                                      backgroundColor: Color(
-                                        int.parse(
-                                            '0xFF${product.secondaryColor}'),
-                                      ),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(12),
+                                  onPressed: () {},
+                                  style: TextButton.styleFrom(
+                                    backgroundColor: Colors.white,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                      side: BorderSide(
+                                        width: 2,
+                                        color: Color(int.parse(
+                                            '0xFF${product.secondaryColor}')),
                                       ),
                                     ),
-                                    child: Text(
-                                      "Add to cart",
-                                      style: GoogleFonts.poppins(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
-                                      ),
-                                    )),
+                                  ),
+                                  child: Icon(
+                                    CupertinoIcons.heart_fill,
+                                    color: Color(int.parse(
+                                        '0xFF${product.secondaryColor}')),
+                                  ),
+                                ),
                               ),
-                            )
-                          ],
+                              const SizedBox(width: 20),
+                              Expanded(
+                                child: SizedBox(
+                                  width: 52,
+                                  height: 52,
+                                  child: TextButton(
+                                      onPressed: () {},
+                                      style: TextButton.styleFrom(
+                                        backgroundColor: Color(
+                                          int.parse(
+                                              '0xFF${product.secondaryColor}'),
+                                        ),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                        ),
+                                      ),
+                                      child: Text(
+                                        "Add to cart",
+                                        style: GoogleFonts.poppins(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                        ),
+                                      )),
+                                ),
+                              )
+                            ],
+                          ),
                         )
                       ],
                     ),
