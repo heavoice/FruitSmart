@@ -43,7 +43,8 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         backgroundColor: Color(int.parse('0xFF${product.color}')),
         body: Column(
           children: [
-            SizedBox(
+            Container(
+              padding: const EdgeInsets.symmetric(vertical: 20),
               height: 250,
               width: double.infinity,
               child: Center(
@@ -58,200 +59,207 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             Expanded(
               child: Container(
                 width: double.infinity,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 30, vertical: 50),
+                clipBehavior: Clip.hardEdge,
                 decoration: const BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(75),
                   ),
                 ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.start,
+                child: SingleChildScrollView(
+                  child: Padding(
+                    padding: const EdgeInsets.all(30),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        SizedBox(
-                          width: double.infinity,
-                          child: Text(product.name,
-                              style: GoogleFonts.poppins(
-                                fontSize: 22,
-                                fontWeight: FontWeight.bold,
-                              )),
-                        ),
-                        SizedBox(
-                          width: double.infinity,
-                          child: Text('\$ ${product.price} / kg',
-                              style: GoogleFonts.poppins(
-                                fontSize: 18,
-                                fontWeight: FontWeight.normal,
-                                color: const Color.fromARGB(255, 164, 162, 162),
-                              )),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 30),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Row(
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            SizedBox(
+                              width: double.infinity,
+                              child: Text(product.name,
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.bold,
+                                  )),
+                            ),
+                            SizedBox(
+                              width: double.infinity,
+                              child: Text('\$ ${product.price} / kg',
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.normal,
+                                    color: const Color.fromARGB(
+                                        255, 164, 162, 162),
+                                  )),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(top: 30),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
-                                  TextButton(
-                                    onPressed: () {
-                                      setState(() {
-                                        if (quantity > 0) {
-                                          quantity--;
-                                        }
-                                      });
-                                    },
-                                    style: TextButton.styleFrom(
-                                      fixedSize: const Size.square(50),
-                                      backgroundColor: const Color(0xFFF5F5F5),
-                                      shape: const RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.only(
-                                          topLeft: Radius.circular(10),
-                                          bottomLeft: Radius.circular(10),
-                                          topRight: Radius.circular(0),
-                                          bottomRight: Radius.circular(0),
+                                  Row(
+                                    children: [
+                                      TextButton(
+                                        onPressed: () {
+                                          setState(() {
+                                            if (quantity > 0) {
+                                              quantity--;
+                                            }
+                                          });
+                                        },
+                                        style: TextButton.styleFrom(
+                                          fixedSize: const Size.square(50),
+                                          backgroundColor:
+                                              const Color(0xFFF5F5F5),
+                                          shape: const RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.only(
+                                              topLeft: Radius.circular(10),
+                                              bottomLeft: Radius.circular(10),
+                                              topRight: Radius.circular(0),
+                                              bottomRight: Radius.circular(0),
+                                            ),
+                                          ),
                                         ),
+                                        child: const Icon(Icons.remove,
+                                            color: Colors.black),
                                       ),
-                                    ),
-                                    child: const Icon(Icons.remove,
-                                        color: Colors.black),
-                                  ),
-                                  Container(
-                                    width: 50,
-                                    height: 50,
-                                    color: const Color(0xFFF5F5F5),
-                                    child: Center(
-                                      child: Text(
-                                        '$quantity',
-                                        style: GoogleFonts.poppins(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  TextButton(
-                                      onPressed: () {
-                                        setState(() {
-                                          quantity++;
-                                        });
-                                      },
-                                      style: TextButton.styleFrom(
-                                        fixedSize: const Size.square(50),
-                                        backgroundColor:
-                                            const Color(0xFFF5F5F5),
-                                        shape: const RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.only(
-                                            topLeft: Radius.circular(0),
-                                            bottomLeft: Radius.circular(0),
-                                            topRight: Radius.circular(10),
-                                            bottomRight: Radius.circular(10),
+                                      Container(
+                                        width: 50,
+                                        height: 50,
+                                        color: const Color(0xFFF5F5F5),
+                                        child: Center(
+                                          child: Text(
+                                            '$quantity',
+                                            style: GoogleFonts.poppins(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold,
+                                            ),
                                           ),
                                         ),
                                       ),
-                                      child: const Icon(Icons.add,
-                                          color: Colors.black)),
+                                      TextButton(
+                                          onPressed: () {
+                                            setState(() {
+                                              quantity++;
+                                            });
+                                          },
+                                          style: TextButton.styleFrom(
+                                            fixedSize: const Size.square(50),
+                                            backgroundColor:
+                                                const Color(0xFFF5F5F5),
+                                            shape: const RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.only(
+                                                topLeft: Radius.circular(0),
+                                                bottomLeft: Radius.circular(0),
+                                                topRight: Radius.circular(10),
+                                                bottomRight:
+                                                    Radius.circular(10),
+                                              ),
+                                            ),
+                                          ),
+                                          child: const Icon(Icons.add,
+                                              color: Colors.black)),
+                                    ],
+                                  ),
+                                  Text(
+                                      '\$ ${(product.price * quantity).toStringAsFixed(1)}',
+                                      style: GoogleFonts.poppins(
+                                        fontSize: 24,
+                                        fontWeight: FontWeight.bold,
+                                      )),
                                 ],
                               ),
-                              Text(
-                                  '\$ ${(product.price * quantity).toStringAsFixed(1)}',
-                                  style: GoogleFonts.poppins(
-                                    fontSize: 24,
-                                    fontWeight: FontWeight.bold,
-                                  )),
-                            ],
-                          ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(top: 30),
+                              child: Column(
+                                children: [
+                                  SizedBox(
+                                    width: double.infinity,
+                                    child: Text(
+                                      "Description",
+                                      style: GoogleFonts.poppins(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                      textAlign: TextAlign.start,
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    width: double.infinity,
+                                    child: Text(
+                                      product.description,
+                                      style: GoogleFonts.poppins(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.normal,
+                                      ),
+                                      textAlign: TextAlign.start,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            )
+                          ],
                         ),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 30),
-                          child: Column(
-                            children: [
-                              SizedBox(
-                                width: double.infinity,
-                                child: Text(
-                                  "Description",
-                                  style: GoogleFonts.poppins(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
+                        Row(
+                          children: [
+                            SizedBox(
+                              width: 52,
+                              height: 52,
+                              child: TextButton(
+                                onPressed: () {},
+                                style: TextButton.styleFrom(
+                                  backgroundColor: Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    side: BorderSide(
+                                      width: 2,
+                                      color: Color(int.parse(
+                                          '0xFF${product.secondaryColor}')),
+                                    ),
                                   ),
-                                  textAlign: TextAlign.start,
                                 ),
-                              ),
-                              SizedBox(
-                                width: double.infinity,
-                                child: Text(
-                                  product.description,
-                                  style: GoogleFonts.poppins(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.normal,
-                                  ),
-                                  textAlign: TextAlign.start,
-                                ),
-                              ),
-                            ],
-                          ),
-                        )
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        SizedBox(
-                          width: 52,
-                          height: 52,
-                          child: TextButton(
-                            onPressed: () {},
-                            style: TextButton.styleFrom(
-                              backgroundColor: Colors.white,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                side: BorderSide(
-                                  width: 2,
+                                child: Icon(
+                                  CupertinoIcons.heart_fill,
                                   color: Color(int.parse(
                                       '0xFF${product.secondaryColor}')),
                                 ),
                               ),
                             ),
-                            child: Icon(
-                              CupertinoIcons.heart_fill,
-                              color: Color(
-                                  int.parse('0xFF${product.secondaryColor}')),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 20),
-                        Expanded(
-                          child: SizedBox(
-                            width: 52,
-                            height: 52,
-                            child: TextButton(
-                                onPressed: () {},
-                                style: TextButton.styleFrom(
-                                  backgroundColor: Color(
-                                    int.parse('0xFF${product.secondaryColor}'),
-                                  ),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                    
-                                  ),
-                                ),
-                                child: Text(
-                                  "Add to cart",
-                                  style: GoogleFonts.poppins(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                  ),
-                                )
-                            ),
-                          ),
+                            const SizedBox(width: 20),
+                            Expanded(
+                              child: SizedBox(
+                                width: 52,
+                                height: 52,
+                                child: TextButton(
+                                    onPressed: () {},
+                                    style: TextButton.styleFrom(
+                                      backgroundColor: Color(
+                                        int.parse(
+                                            '0xFF${product.secondaryColor}'),
+                                      ),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                    ),
+                                    child: Text(
+                                      "Add to cart",
+                                      style: GoogleFonts.poppins(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
+                                    )),
+                              ),
+                            )
+                          ],
                         )
                       ],
-                    )
-                  ],
+                    ),
+                  ),
                 ),
               ),
             )
