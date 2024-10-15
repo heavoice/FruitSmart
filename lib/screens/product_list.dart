@@ -2,8 +2,24 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:smart_shop_app/dummy/fruits_list.dart';
 
-class ProductListScreen extends StatelessWidget {
-  const ProductListScreen({super.key});
+class ProductListScreen extends StatefulWidget {
+  const ProductListScreen({Key? key}) : super(key: key);
+
+  @override
+  _ProductListState createState() => _ProductListState();
+}
+
+class _ProductListState extends State<ProductListScreen> {
+  List<Product> filteredProduct = products;
+
+  filterProduct(String query) {
+    setState(() {
+      filteredProduct = products
+          .where((product) =>
+              product.name.toLowerCase().contains(query.toLowerCase()))
+          .toList();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -65,6 +81,7 @@ class ProductListScreen extends StatelessWidget {
             ),
             SliverToBoxAdapter(
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   SizedBox(
                     width: double.infinity,
@@ -86,6 +103,7 @@ class ProductListScreen extends StatelessWidget {
                       style: GoogleFonts.poppins(
                         fontSize: 16,
                       ),
+                      onChanged: filterProduct,
                       decoration: InputDecoration(
                         filled: true,
                         hintText: 'Search',
@@ -107,11 +125,24 @@ class ProductListScreen extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(
                         horizontal: 32, vertical: 20),
                     child: Wrap(
+                     
                       spacing: 10,
                       runSpacing: 10,
                       children: [
-                        for (final product in products)
-                          InkWell(
+                        if (filteredProduct.isEmpty)
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 32),
+                            child: Text(
+                              'No product found',
+                              style: GoogleFonts.poppins(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          )
+                        else
+                          for (final product in filteredProduct)
+                            GestureDetector(
                             onTap: () {
                               Navigator.pushNamed(
                                 context,
@@ -147,7 +178,7 @@ class ProductListScreen extends StatelessWidget {
                                       SizedBox(
                                         width: double.infinity,
                                         child: Text(
-                                          "\$ ${product.price}",
+                                            "\$ ${product.price} / kg",
                                           style: GoogleFonts.poppins(
                                             fontSize: 12,
                                             fontWeight: FontWeight.w500,

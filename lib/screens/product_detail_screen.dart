@@ -39,6 +39,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           backgroundColor: Colors.transparent,
           toolbarHeight: 80,
           title: const CustomAppBar(),
+          surfaceTintColor: Colors.transparent,
         ),
         backgroundColor: Color(int.parse('0xFF${product.color}')),
         body: Column(
