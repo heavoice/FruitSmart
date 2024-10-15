@@ -20,7 +20,7 @@ class SmartShopApp extends StatelessWidget {
       routes: {
         '/product-list': (context) => const ProductListScreen(),
         '/detail': (context) => const ProductDetailScreen(),
-        "/card": (context) => const CartScreen(),
+        "/cart": (context) => const CartScreen(),
       },
     );
   }
