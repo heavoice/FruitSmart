@@ -1,4 +1,4 @@
-name: SmartShopApp
+name: smart_shop_app
 description: "A new Flutter project."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
@@ -33,7 +33,10 @@ dependencies:
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
+  flutter_riverpod: ^2.5.3
   cupertino_icons: ^1.0.2
+  google_fonts: ^6.2.1
+  provider: ^6.1.2
 
 dev_dependencies:
   flutter_test:
@@ -56,13 +59,13 @@ flutter:
   # the material Icons class.
   uses-material-design: true
   assets:
-    - assets/img/1.jpg
-    - assets/img/2.jpg
-    - assets/img/3.jpg
-    - assets/img/4.jpg
-    - assets/img/5.png
-    - assets/img/6.jpg
-    - assets/img/7.jpg
+    - assets/img/blueberry.png
+    - assets/img/dragon.png
+    - assets/img/lychee.png
+    - assets/img/mango.png
+    - assets/img/pineapple.png
+    - assets/img/strawberry.png
+    - assets/img/fruits.png
 
   # To add assets to your application, add an assets section, like this:
   # assets:
