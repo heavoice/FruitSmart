@@ -14,15 +14,17 @@ class CartProvider extends StateNotifier<List<CartItem>> {
   CartProvider() : super([]);
 
   void addToCart(Product product, int quantity) {
-    final existingItem = state.firstWhere(
+    final existingItemIndex = state.indexWhere(
       (item) => item.product.id == product.id,
-      orElse: () => CartItem(product: product, quantity: 0),
     );
 
-    if (existingItem.quantity > 0) {
-      existingItem.quantity++; // Increase quantity if exists
+    if (existingItemIndex >= 0) {
+      // Jika item sudah ada di keranjang, tambahkan jumlahnya
+      state[existingItemIndex].quantity += quantity;
+      state = [...state]; // Perbarui state untuk memicu UI update
     } else {
-      state = [...state, CartItem(product: product)]; // Add new item
+      // Jika item tidak ada, tambahkan item baru dengan jumlah tertentu
+      state = [...state, CartItem(product: product, quantity: quantity)];
     }
   }
 
@@ -31,7 +33,6 @@ class CartProvider extends StateNotifier<List<CartItem>> {
   }
 }
 
-// Define the provider
 final cartProvider = StateNotifierProvider<CartProvider, List<CartItem>>((ref) {
   return CartProvider();
 });

@@ -28,7 +28,6 @@ class ProductDetailScreen extends ConsumerWidget {
       );
     }
 
-    // Use quantityProvider to get the quantity
     int quantity = ref.watch(quantityProvider);
 
     return Scaffold(

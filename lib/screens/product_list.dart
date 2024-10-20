@@ -28,7 +28,7 @@ class _ProductListState extends State<ProductListScreen> {
     return PopScope(
       canPop: false,
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: const Color(0xFFFFF1AD),
         body: CustomScrollView(
           slivers: [
             SliverAppBar(
@@ -88,7 +88,7 @@ class _ProductListState extends State<ProductListScreen> {
                 ),
               ),
               automaticallyImplyLeading: false,
-              backgroundColor: Colors.white,
+              backgroundColor: const Color(0xFFFFF1AD),
               elevation: 0, // Menghilangkan bayangan
             ),
             SliverToBoxAdapter(
