@@ -28,6 +28,10 @@ class CartProvider extends StateNotifier<List<CartItem>> {
     }
   }
 
+  void removeFromCart(Product product) {
+    state = state.where((item) => item.product.id != product.id).toList();
+  }
+
   void clearCart() {
     state = [];
   }

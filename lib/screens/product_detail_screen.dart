@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:smart_shop_app/dummy/fruits_list.dart';
-import 'package:smart_shop_app/provider/provider.dart';
+import 'package:smart_shop_app/provider/cartprovider.dart';
 
 class ProductDetailScreen extends ConsumerWidget {
   const ProductDetailScreen({Key? key}) : super(key: key);
@@ -60,9 +60,6 @@ class ProductDetailScreen extends ConsumerWidget {
               clipBehavior: Clip.hardEdge,
               decoration: const BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(75),
-                ),
               ),
               child: SingleChildScrollView(
                 child: Padding(
@@ -170,12 +167,13 @@ class ProductDetailScreen extends ConsumerWidget {
                           Padding(
                             padding: const EdgeInsets.only(top: 30),
                             child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  "Description",
+                                  'Description',
                                   style: GoogleFonts.poppins(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
                                   ),
                                   textAlign: TextAlign.start,
                                 ),
