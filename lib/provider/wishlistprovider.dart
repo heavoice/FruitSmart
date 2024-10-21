@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:smart_shop_app/dummy/fruits_list.dart'; // Import the correct Product class
+import 'package:smart_shop_app/dummy/fruits_list.dart';
 
 // StateNotifier to manage the wishlist
 class WishlistNotifier extends StateNotifier<List<Product>> {

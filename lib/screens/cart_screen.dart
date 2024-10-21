@@ -236,6 +236,16 @@ class CartScreen extends ConsumerWidget {
                                       ref
                                           .read(cartProvider.notifier)
                                           .clearCart();
+
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        SnackBar(
+                                          content: Text(
+                                              'You have checked out \$${cartItems.fold(0.0, (total, cartItem) => total + (cartItem.product.price * cartItem.quantity)).toStringAsFixed(2)}!'),
+                                          backgroundColor: Colors.green,
+                                          duration: const Duration(seconds: 2),
+                                        ),
+                                      );
                                     },
                                     style: ElevatedButton.styleFrom(
                                       padding: const EdgeInsets.symmetric(
@@ -260,8 +270,8 @@ class CartScreen extends ConsumerWidget {
                   )
                 : SliverFillRemaining(
                     child: Container(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 35, vertical: 8),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 35, vertical: 8),
                       color: const Color(0xFFFFF1AD),
                       child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,

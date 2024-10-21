@@ -252,7 +252,6 @@ class ProductDetailScreen extends ConsumerWidget {
                                 height: 52,
                                 child: TextButton(
                                   onPressed: () {
-                                    // Add the product to the cart
                                     ref
                                         .read(cartProvider.notifier)
                                         .addToCart(product, quantity);

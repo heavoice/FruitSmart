@@ -10,6 +10,7 @@ class WishlistScreen extends ConsumerWidget {
     final wishlist = ref.watch(wishlistProvider);
 
     return Scaffold(
+      backgroundColor: const Color(0xFFFFF1AD),
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
