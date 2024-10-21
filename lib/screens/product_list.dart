@@ -83,6 +83,29 @@ class _ProductListState extends State<ProductListScreen> {
                           color: Color(0xFF130F26),
                         ),
                       ),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.pushNamed(context, '/wishlist');
+                      },
+                      child: Container(
+                        width: 50,
+                        height: 50,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          border: Border.all(
+                            color: const Color(0xFFF5F5F5),
+                            width: 1,
+                          ),
+                          borderRadius: const BorderRadius.all(
+                            Radius.circular(12),
+                          ),
+                        ),
+                        child: const Icon(
+                          Icons.favorite,
+                          color: Color(0xFF130F26),
+                        ),
+                      ),
                     )
                   ],
                 ),

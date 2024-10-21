@@ -2,16 +2,20 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:smart_shop_app/dummy/fruits_list.dart';
+import 'package:smart_shop_app/dummy/fruits_list.dart' as fruits;
 import 'package:smart_shop_app/provider/cartprovider.dart';
+import 'package:smart_shop_app/provider/wishlistprovider.dart' as provider;
 
 class ProductDetailScreen extends ConsumerWidget {
   const ProductDetailScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final Product? product =
-        ModalRoute.of(context)!.settings.arguments as Product?;
+    final wishlist = ref.watch(provider.wishlistProvider);
+    final wishlistNotifier = ref.read(provider.wishlistProvider.notifier);
+    final fruits.Product? product =
+        ModalRoute.of(context)!.settings.arguments as fruits.Product?;
+    bool isInWishlist = wishlist.contains(product);
 
     if (product == null) {
       return Scaffold(
@@ -198,7 +202,31 @@ class ProductDetailScreen extends ConsumerWidget {
                               width: 52,
                               height: 52,
                               child: TextButton(
-                                onPressed: () {},
+                                onPressed: () {
+                                  if (isInWishlist) {
+                                    wishlistNotifier.removeProduct(product);
+
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                            '${product.name} was removed from your wishlist'),
+                                        backgroundColor: Colors.red,
+                                        duration: const Duration(seconds: 2),
+                                      ),
+                                    );
+                                  } else {
+                                    wishlistNotifier.addProduct(product);
+
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                            '${product.name} was added to your wishlist'),
+                                        backgroundColor: Colors.green,
+                                        duration: const Duration(seconds: 2),
+                                      ),
+                                    );
+                                  }
+                                },
                                 style: TextButton.styleFrom(
                                   backgroundColor: Colors.white,
                                   shape: RoundedRectangleBorder(

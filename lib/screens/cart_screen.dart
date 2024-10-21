@@ -10,6 +10,7 @@ class CartScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final cartItems = ref.watch(cartProvider);
 
+    // ignore: deprecated_member_use
     return WillPopScope(
       onWillPop: () async => false,
       child: Scaffold(
@@ -68,6 +69,29 @@ class CartScreen extends ConsumerWidget {
                         ),
                       ),
                     ),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.pushNamed(context, '/wishlist');
+                      },
+                      child: Container(
+                        width: 50,
+                        height: 50,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          border: Border.all(
+                            color: const Color(0xFFF5F5F5),
+                            width: 1,
+                          ),
+                          borderRadius: const BorderRadius.all(
+                            Radius.circular(12),
+                          ),
+                        ),
+                        child: const Icon(
+                          Icons.favorite,
+                          color: Color(0xFF130F26),
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -117,7 +141,7 @@ class CartScreen extends ConsumerWidget {
                                       contentPadding: EdgeInsets.zero,
                                       title: Text(
                                         cartItem.product.name,
-                                        style: TextStyle(
+                                        style: const TextStyle(
                                           fontSize: 18,
                                           fontWeight: FontWeight.bold,
                                         ),
@@ -236,17 +260,33 @@ class CartScreen extends ConsumerWidget {
                   )
                 : SliverFillRemaining(
                     child: Container(
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 35, vertical: 8),
                       color: const Color(0xFFFFF1AD),
-                      child: Center(
-                        child: Text(
-                          "Your cart is empty",
-                          style: GoogleFonts.poppins(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.grey,
-                          ),
-                        ),
-                      ),
+                      child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Welcome to FruitSmart',
+                              style: GoogleFonts.poppins(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(
+                              height: 300,
+                            ),
+                            Align(
+                                alignment: Alignment.center,
+                                child: Text(
+                                  "Your cart is empty",
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.grey,
+                                  ),
+                                )),
+                          ]),
                     ),
                   ),
           ],

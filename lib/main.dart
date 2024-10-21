@@ -4,6 +4,7 @@ import 'package:smart_shop_app/screens/cart_screen.dart';
 import 'package:smart_shop_app/screens/home_screen.dart';
 import 'package:smart_shop_app/screens/product_detail_screen.dart';
 import 'package:smart_shop_app/screens/product_list.dart';
+import 'package:smart_shop_app/screens/wishlist_screen.dart';
 
 void main() {
   runApp(const SmartShopApp());
@@ -24,6 +25,7 @@ class SmartShopApp extends StatelessWidget {
           '/product-list': (context) => const ProductListScreen(),
           '/detail': (context) => const ProductDetailScreen(),
           '/cart': (context) => const CartScreen(),
+          '/wishlist': (context) => const WishlistScreen(),
         },
       ),
     );
