@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "173453066921",
+    "project_id": "fruitsmart-2a32d",
+    "storage_bucket": "fruitsmart-2a32d.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:173453066921:android:34abc4e8b67f1f2f491fb8",
+        "android_client_info": {
+          "package_name": "com.heavoice.cihuy"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDHba2QfJeljNEr_mw_8SOJpVJk8NeXI4k"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
