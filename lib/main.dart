@@ -6,7 +6,6 @@ import 'package:smart_shop_app/screens/splash_screen.dart';
 import 'firebase_options.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:smart_shop_app/screens/cart_screen.dart';
-import 'package:smart_shop_app/screens/home_screen.dart';
 import 'package:smart_shop_app/screens/product_detail_screen.dart';
 import 'package:smart_shop_app/screens/product_list.dart';
 import 'package:smart_shop_app/screens/wishlist_screen.dart';
@@ -32,7 +31,7 @@ class SmartShopApp extends StatelessWidget {
         home: const SplashScreen(),
         routes: {
           '/auth': (context) => const AuthScreen(),
-          '/homescreen': (context) => const HomeScreen(),
+          "/home": (context) => const SplashScreen(),
           '/product-list': (context) => const ProductListScreen(),
           '/detail': (context) => const ProductDetailScreen(),
           '/cart': (context) => const CartScreen(),
