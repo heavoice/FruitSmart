@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:smart_shop_app/config/theme/app_theme.dart';
 import 'package:smart_shop_app/screens/auth_screen.dart';
+import 'package:smart_shop_app/screens/splash_screen.dart';
 import 'firebase_options.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:smart_shop_app/screens/cart_screen.dart';
@@ -26,7 +28,8 @@ class SmartShopApp extends StatelessWidget {
       child: MaterialApp(
         title: 'FruitSmart',
         debugShowCheckedModeBanner: false,
-        home: const AuthScreen(),
+        theme: AppTheme.lightTheme,
+        home: const SplashScreen(),
         routes: {
           '/auth': (context) => const AuthScreen(),
           '/homescreen': (context) => const HomeScreen(),
