@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:smart_shop_app/dummy/fruits_list.dart' as fruits;
+import 'package:smart_shop_app/constant/fruits_list.dart' as fruits;
 import 'package:smart_shop_app/provider/cartprovider.dart';
 import 'package:smart_shop_app/provider/wishlistprovider.dart' as provider;
 

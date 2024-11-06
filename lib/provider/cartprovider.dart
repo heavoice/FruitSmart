@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:smart_shop_app/dummy/fruits_list.dart';
+import 'package:smart_shop_app/constant/fruits_list.dart';
 
 final quantityProvider = StateProvider<int>((ref) => 0);
 

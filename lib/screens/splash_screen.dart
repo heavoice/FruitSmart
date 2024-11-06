@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:smart_shop_app/config/images/app_images.dart';
 import 'package:smart_shop_app/config/theme/app_colors.dart';
-import 'package:smart_shop_app/screens/auth_screen.dart';
+import 'package:smart_shop_app/screens/main_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -75,6 +75,8 @@ class _SplashScreenState extends State<SplashScreen> {
     Navigator.pushReplacement(
         // ignore: use_build_context_synchronously
         context,
-        MaterialPageRoute(builder: (context) => const AuthScreen()));
+        MaterialPageRoute(
+          builder: (context) => const MainScreen(),
+        ));
   }
 }
