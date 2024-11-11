@@ -373,8 +373,8 @@ class BestSellingCard extends StatelessWidget {
                 child: Image.asset(
                   product.image,
                   fit: BoxFit.contain,
-                  width: 90,
-                  height: 90,
+                  width: 150,
+                  height: 150,
                 ),
               ),
               Align(
