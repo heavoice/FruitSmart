@@ -7,16 +7,10 @@ import 'package:smart_shop_app/screens/home_screen.dart';
 import 'package:smart_shop_app/screens/product_list.dart';
 import 'package:smart_shop_app/screens/wishlist_screen.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
-
-
-// Provider untuk mengatur state navigasi
-final navigationProvider =
-    StateNotifierProvider<NavigationController, int>((ref) {
-  return NavigationController();
-});
+import 'package:smart_shop_app/provider/navprovider.dart';
 
 class MainScreen extends ConsumerWidget {
-  const MainScreen({Key? key}) : super(key: key);
+  const MainScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -32,10 +26,11 @@ class MainScreen extends ConsumerWidget {
 
     return Scaffold(
       body: screens[currentIndex],
-      bottomNavigationBar: Padding(
+      bottomNavigationBar: Container(
+        color: AppColors.primary,
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         child: GNav(
-          backgroundColor: Colors.white,
+          backgroundColor: AppColors.primary,
           gap: 8,
           padding: const EdgeInsets.all(10),
           selectedIndex: currentIndex,
@@ -54,13 +49,5 @@ class MainScreen extends ConsumerWidget {
         ),
       ),
     );
-  }
-}
-
-class NavigationController extends StateNotifier<int> {
-  NavigationController() : super(0);
-
-  void updateIndex(int index) {
-    state = index;
   }
 }

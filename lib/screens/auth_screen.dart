@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:smart_shop_app/config/images/app_images.dart';
 import 'package:smart_shop_app/config/theme/app_colors.dart';
-import 'package:smart_shop_app/screens/product_list.dart';
+import 'package:smart_shop_app/screens/main_screen.dart';
 import 'package:smart_shop_app/widget/app_button.dart';
 
 class AuthScreen extends StatefulWidget {
@@ -46,7 +46,7 @@ class _AuthScreenState extends State<AuthScreen> {
       }
 
       Navigator.of(context).pushReplacement(MaterialPageRoute(
-        builder: (context) => const ProductListScreen(),
+        builder: (context) => const MainScreen(),
       ));
     } on FirebaseAuthException catch (e) {
       // Show specific error messages
@@ -60,7 +60,7 @@ class _AuthScreenState extends State<AuthScreen> {
           errorMessage = 'Terjadi kesalahan: ${e.message}';
         }
       });
-      
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(errorMessage)),
       );

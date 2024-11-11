@@ -7,7 +7,7 @@ import 'package:smart_shop_app/provider/cartprovider.dart';
 import 'package:smart_shop_app/provider/wishlistprovider.dart' as provider;
 
 class ProductDetailScreen extends ConsumerWidget {
-  const ProductDetailScreen({Key? key}) : super(key: key);
+  const ProductDetailScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -299,7 +299,7 @@ class ProductDetailScreen extends ConsumerWidget {
 }
 
 class CustomAppBar extends StatelessWidget {
-  const CustomAppBar({Key? key}) : super(key: key);
+  const CustomAppBar({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -310,7 +310,7 @@ class CustomAppBar extends StatelessWidget {
         children: [
           GestureDetector(
             onTap: () {
-              Navigator.pushNamed(context, "/product-list");
+              Navigator.pushNamed(context, "/main");
             },
             child: Container(
               width: 50,
@@ -332,7 +332,7 @@ class CustomAppBar extends StatelessWidget {
             ),
           ),
           GestureDetector(
-            onTap: () => Navigator.pushNamed(context, "/cart"),
+            onTap: () => Navigator.pushNamed(context, "/main"),
             child: Container(
               width: 50,
               height: 50,
@@ -347,7 +347,7 @@ class CustomAppBar extends StatelessWidget {
                 ),
               ),
               child: const Icon(
-                Icons.shopping_cart,
+                Icons.home,
                 color: Color(0xFF130F26),
               ),
             ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:smart_shop_app/config/theme/app_colors.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:smart_shop_app/provider/cartprovider.dart';
 
@@ -16,107 +17,37 @@ class CartScreen extends ConsumerWidget {
       child: Scaffold(
         body: CustomScrollView(
           slivers: [
-            SliverAppBar(
+            const SliverAppBar(
               toolbarHeight: 100,
               title: Padding(
-                padding: const EdgeInsets.all(20),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.pushNamed(context, '/product-list');
-                      },
-                      child: Container(
-                        width: 50,
-                        height: 50,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          border: Border.all(
-                            color: const Color(0xFFF5F5F5),
-                            width: 1,
-                          ),
-                          borderRadius: const BorderRadius.all(
-                            Radius.circular(12),
-                          ),
-                        ),
-                        child: const Icon(
-                          Icons.arrow_back_rounded,
-                          color: Color(0xFF130F26),
-                        ),
-                      ),
+                padding: EdgeInsets.all(20),
+                child: Center(
+                  child: Text(
+                    'Checkout',
+                    style: TextStyle(
+                      color: AppColors.background,
+                      fontSize: 26,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: "Satoshi",
                     ),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.pushNamed(context, '/cart');
-                      },
-                      child: Container(
-                        width: 50,
-                        height: 50,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          border: Border.all(
-                            color: const Color(0xFFF5F5F5),
-                            width: 1,
-                          ),
-                          borderRadius: const BorderRadius.all(
-                            Radius.circular(12),
-                          ),
-                        ),
-                        child: const Icon(
-                          Icons.shopping_bag_outlined,
-                          color: Color(0xFF130F26),
-                        ),
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.pushNamed(context, '/wishlist');
-                      },
-                      child: Container(
-                        width: 50,
-                        height: 50,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          border: Border.all(
-                            color: const Color(0xFFF5F5F5),
-                            width: 1,
-                          ),
-                          borderRadius: const BorderRadius.all(
-                            Radius.circular(12),
-                          ),
-                        ),
-                        child: const Icon(
-                          Icons.favorite,
-                          color: Color(0xFF130F26),
-                        ),
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
               ),
               automaticallyImplyLeading: false,
-              backgroundColor: const Color(0xFFFFF1AD),
+              backgroundColor: AppColors.primary,
               elevation: 0,
               pinned: true,
             ),
             cartItems.isNotEmpty
                 ? SliverFillRemaining(
                     child: Container(
-                      color: const Color(0xFFFFF1AD),
+                      color: Colors.white,
                       child: Padding(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 35, vertical: 8),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              'Welcome to FruitSmart',
-                              style: GoogleFonts.poppins(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
                             const SizedBox(height: 20),
                             Expanded(
                               child: ListView.builder(
@@ -124,7 +55,7 @@ class CartScreen extends ConsumerWidget {
                                 itemBuilder: (context, index) {
                                   final cartItem = cartItems[index];
                                   return Container(
-                                    padding: const EdgeInsets.all(12),
+                                    padding: const EdgeInsets.all(4),
                                     margin: const EdgeInsets.only(bottom: 10),
                                     decoration: BoxDecoration(
                                       color: Colors.white,
@@ -137,81 +68,106 @@ class CartScreen extends ConsumerWidget {
                                         ),
                                       ],
                                     ),
-                                    child: ListTile(
-                                      contentPadding: EdgeInsets.zero,
-                                      title: Text(
-                                        cartItem.product.name,
-                                        style: const TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                      subtitle: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            'Quantity: ${cartItem.quantity}',
-                                            style: GoogleFonts.poppins(
-                                              fontSize: 16,
-                                              color: Colors.grey,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      leading: ClipOval(
-                                        child: Image.network(
-                                          cartItem.product.image,
-                                          width: 50,
-                                          height: 50,
-                                          fit: BoxFit.cover,
-                                        ),
-                                      ),
-                                      trailing: Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Text(
-                                            'Total: \$${(cartItem.quantity * cartItem.product.price).toStringAsFixed(2)}',
-                                            style: GoogleFonts.poppins(
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.black,
-                                            ),
-                                          ),
-                                          IconButton(
-                                            icon: const Icon(Icons.remove),
-                                            onPressed: () {
-                                              if (cartItem.quantity > 1) {
-                                                ref
-                                                    .read(cartProvider.notifier)
-                                                    .addToCart(
-                                                        cartItem.product, -1);
-                                              } else {
-                                                ref
-                                                    .read(cartProvider.notifier)
-                                                    .removeFromCart(
-                                                        cartItem.product);
-                                              }
-                                            },
-                                          ),
-                                          Text(
-                                            '${cartItem.quantity}',
-                                            style: GoogleFonts.poppins(
-                                              fontSize: 16,
+                                    child: Builder(
+                                      builder: (context) {
+                                        double screenWidth =
+                                            MediaQuery.of(context).size.width;
+                                        double fontSize =
+                                            screenWidth <= 451 ? 7 : 18;
+                                        double iconSize =
+                                            screenWidth <= 451 ? 14 : 24;
+
+                                        return ListTile(
+                                          contentPadding: EdgeInsets.zero,
+                                          title: Text(
+                                            cartItem.product.name,
+                                            style: TextStyle(
+                                              fontSize: fontSize,
                                               fontWeight: FontWeight.bold,
                                             ),
                                           ),
-                                          IconButton(
-                                            icon: const Icon(Icons.add),
-                                            onPressed: () {
-                                              ref
-                                                  .read(cartProvider.notifier)
-                                                  .addToCart(
-                                                      cartItem.product, 1);
-                                            },
+                                          subtitle: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Transform.translate(
+                                                offset: Offset(
+                                                  0, // No horizontal translation
+                                                  screenWidth <= 451
+                                                      ? -10
+                                                      : 0, // Move the widget up by 10 pixels when the screen width is <= 451, otherwise no translation
+                                                ),
+                                                child: Text(
+                                                  'Quantity: ${cartItem.quantity}',
+                                                  style: GoogleFonts.poppins(
+                                                    fontSize: fontSize - 2,
+                                                    color: Colors.grey,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
                                           ),
-                                        ],
-                                      ),
+                                          leading: ClipOval(
+                                            child: Image.network(
+                                              cartItem.product.image,
+                                              width: iconSize + 10,
+                                              height: iconSize + 10,
+                                              fit: BoxFit.cover,
+                                            ),
+                                          ),
+                                          trailing: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Text(
+                                                'Total: \$${(cartItem.quantity * cartItem.product.price).toStringAsFixed(2)}',
+                                                style: GoogleFonts.poppins(
+                                                  fontSize: fontSize - 2,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.black,
+                                                ),
+                                              ),
+                                              IconButton(
+                                                icon: const Icon(Icons.remove),
+                                                iconSize: iconSize,
+                                                onPressed: () {
+                                                  if (cartItem.quantity > 1) {
+                                                    ref
+                                                        .read(cartProvider
+                                                            .notifier)
+                                                        .addToCart(
+                                                            cartItem.product,
+                                                            -1);
+                                                  } else {
+                                                    ref
+                                                        .read(cartProvider
+                                                            .notifier)
+                                                        .removeFromCart(
+                                                            cartItem.product);
+                                                  }
+                                                },
+                                              ),
+                                              Text(
+                                                '${cartItem.quantity}',
+                                                style: GoogleFonts.poppins(
+                                                  fontSize: fontSize,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                              IconButton(
+                                                icon: const Icon(Icons.add),
+                                                iconSize: iconSize,
+                                                onPressed: () {
+                                                  ref
+                                                      .read(
+                                                          cartProvider.notifier)
+                                                      .addToCart(
+                                                          cartItem.product, 1);
+                                                },
+                                              ),
+                                            ],
+                                          ),
+                                        );
+                                      },
                                     ),
                                   );
                                 },
@@ -272,17 +228,10 @@ class CartScreen extends ConsumerWidget {
                     child: Container(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 35, vertical: 8),
-                      color: const Color(0xFFFFF1AD),
+                      color: Colors.white,
                       child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              'Welcome to FruitSmart',
-                              style: GoogleFonts.poppins(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
                             const SizedBox(
                               height: 300,
                             ),

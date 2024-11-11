@@ -4,7 +4,7 @@ import 'package:smart_shop_app/config/theme/app_colors.dart';
 import 'package:smart_shop_app/constant/fruits_list.dart';
 
 class ProductListScreen extends StatefulWidget {
-  const ProductListScreen({Key? key}) : super(key: key);
+  const ProductListScreen({super.key});
 
   @override
   // ignore: library_private_types_in_public_api
@@ -100,7 +100,7 @@ class _ProductListState extends State<ProductListScreen> {
 
 class ProductItem extends StatelessWidget {
   final Product product;
-  const ProductItem({Key? key, required this.product}) : super(key: key);
+  const ProductItem({super.key, required this.product});
 
   @override
   Widget build(BuildContext context) {

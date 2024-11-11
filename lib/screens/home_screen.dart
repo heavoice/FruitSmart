@@ -3,7 +3,7 @@ import 'package:hugeicons/hugeicons.dart';
 import 'package:smart_shop_app/config/theme/app_colors.dart';
 
 class HomeScreen extends StatelessWidget {
-const HomeScreen({Key? key}) : super(key: key);
+  const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
