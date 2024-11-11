@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:smart_shop_app/constant/fruits_list.dart' as fruits;
 import 'package:smart_shop_app/provider/cartprovider.dart';
 import 'package:smart_shop_app/provider/wishlistprovider.dart' as provider;
+import 'package:hugeicons/hugeicons.dart';
 
 class ProductDetailScreen extends ConsumerWidget {
   const ProductDetailScreen({super.key});
@@ -346,9 +347,10 @@ class CustomAppBar extends StatelessWidget {
                   Radius.circular(12),
                 ),
               ),
-              child: const Icon(
-                Icons.home,
-                color: Color(0xFF130F26),
+              child: HugeIcon(
+                icon: HugeIcons.strokeRoundedHome07,
+                color: Colors.black,
+                size: 24.0,
               ),
             ),
           ),
@@ -357,3 +359,5 @@ class CustomAppBar extends StatelessWidget {
     );
   }
 }
+
+

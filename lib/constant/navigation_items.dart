@@ -16,7 +16,7 @@ List<NavigationItem> navigationItems = [
   const NavigationItem(
     icon: HugeIcon(
       icon: HugeIcons.strokeRoundedHome03,
-      color: AppColors.darkSecondary,
+      color: AppColors.background,
       size: 24.0,
     ),
     label: 'Home',
@@ -24,7 +24,7 @@ List<NavigationItem> navigationItems = [
   const NavigationItem(
     icon: HugeIcon(
       icon: HugeIcons.strokeRoundedGridView,
-      color: AppColors.darkSecondary,
+      color: AppColors.background,
       size: 24.0,
     ),
     label: 'Produk',
@@ -32,7 +32,7 @@ List<NavigationItem> navigationItems = [
   const NavigationItem(
     icon: HugeIcon(
       icon: HugeIcons.strokeRoundedShoppingBasket01,
-      color: AppColors.darkSecondary,
+      color: AppColors.background,
       size: 24.0,
     ),
     label: 'Keranjang',
@@ -40,7 +40,7 @@ List<NavigationItem> navigationItems = [
   const NavigationItem(
     icon: HugeIcon(
       icon: HugeIcons.strokeRoundedFavourite,
-      color: AppColors.darkSecondary,
+      color: AppColors.background,
       size: 24.0,
     ),
     label: 'Wishlist',
@@ -48,7 +48,7 @@ List<NavigationItem> navigationItems = [
   const NavigationItem(
     icon: HugeIcon(
       icon: HugeIcons.strokeRoundedInvoice01,
-      color: AppColors.darkSecondary,
+      color: AppColors.background,
       size: 24.0,
     ),
     label: 'Transaksi',

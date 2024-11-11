@@ -33,11 +33,13 @@ class MainScreen extends ConsumerWidget {
           backgroundColor: AppColors.primary,
           gap: 8,
           padding: const EdgeInsets.all(10),
+          color: AppColors.primary,
+          activeColor: AppColors.background,
           selectedIndex: currentIndex,
           onTabChange: (index) {
             ref.read(navigationProvider.notifier).updateIndex(index);
           },
-          tabBackgroundColor: AppColors.primary.withOpacity(0.2),
+          tabBackgroundColor: AppColors.lightGrey.withOpacity(0.2),
           tabs: [
             for (var item in navigationItems)
               GButton(
