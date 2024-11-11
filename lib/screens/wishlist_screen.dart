@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:smart_shop_app/provider/wishlistprovider.dart';
+import 'package:smart_shop_app/provider/navprovider.dart';
+
 
 class WishlistScreen extends ConsumerWidget {
   const WishlistScreen({super.key});
@@ -45,7 +47,8 @@ class WishlistScreen extends ConsumerWidget {
                   ),
                   GestureDetector(
                     onTap: () {
-                      Navigator.pushNamed(context, '/cart');
+                      Navigator.pushNamed(context, '/main');
+                      ref.read(navigationProvider.notifier).updateIndex(2);
                     },
                     child: Container(
                       width: 50,
