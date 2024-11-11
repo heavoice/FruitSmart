@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hugeicons/hugeicons.dart';
+import 'package:smart_shop_app/config/theme/app_colors.dart';
 import 'package:smart_shop_app/provider/wishlistprovider.dart';
 import 'package:smart_shop_app/provider/navprovider.dart';
-
 
 class WishlistScreen extends ConsumerWidget {
   const WishlistScreen({super.key});
@@ -12,7 +13,7 @@ class WishlistScreen extends ConsumerWidget {
     final wishlist = ref.watch(wishlistProvider);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFFFF1AD),
+      backgroundColor: Colors.white,
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
@@ -22,58 +23,32 @@ class WishlistScreen extends ConsumerWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.pushNamed(context, '/product-list');
-                    },
-                    child: Container(
-                      width: 50,
-                      height: 50,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        border: Border.all(
-                          color: const Color(0xFFF5F5F5),
-                          width: 1,
-                        ),
-                        borderRadius: const BorderRadius.all(
-                          Radius.circular(12),
-                        ),
-                      ),
-                      child: const Icon(
-                        Icons.arrow_back_rounded,
-                        color: Color(0xFF130F26),
-                      ),
+                  SizedBox(),
+                  Text(
+                    'Wishlist',
+                    style: TextStyle(
+                      color: AppColors.background,
+                      fontSize: 26,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: "Satoshi",
                     ),
                   ),
-                  GestureDetector(
-                    onTap: () {
+                  TextButton(
+                    onPressed: () {
                       Navigator.pushNamed(context, '/main');
                       ref.read(navigationProvider.notifier).updateIndex(2);
                     },
-                    child: Container(
-                      width: 50,
-                      height: 50,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        border: Border.all(
-                          color: const Color(0xFFF5F5F5),
-                          width: 1,
-                        ),
-                        borderRadius: const BorderRadius.all(
-                          Radius.circular(12),
-                        ),
-                      ),
-                      child: const Icon(
-                        Icons.shopping_bag_outlined,
-                        color: Color(0xFF130F26),
-                      ),
+                    child: const HugeIcon(
+                      icon: HugeIcons.strokeRoundedFavourite,
+                      size: 32,
+                      color: Colors.white,
                     ),
                   ),
                 ],
               ),
             ),
             automaticallyImplyLeading: false,
-            backgroundColor: const Color(0xFFFFF1AD),
+            backgroundColor: AppColors.primary,
             elevation: 0,
             pinned: true,
           ),

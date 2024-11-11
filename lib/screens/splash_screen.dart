@@ -76,10 +76,10 @@ class _SplashScreenState extends State<SplashScreen> {
   Future<void> redirect() async {
     await Future.delayed(const Duration(seconds: 2));
     Navigator.pushReplacement(
-        // ignore: use_build_context_synchronously
-        context,
+      // ignore: use_build_context_synchronously
+      context,
       MaterialPageRoute(
-        builder: (context) => const AuthScreen(),
+        builder: (context) => const MainScreen(),
       ),
     );
   }
