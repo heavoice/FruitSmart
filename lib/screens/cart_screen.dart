@@ -173,52 +173,64 @@ class CartScreen extends ConsumerWidget {
                                 },
                               ),
                             ),
-                            Container(
-                              padding: const EdgeInsets.symmetric(vertical: 16),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    'Total: \$${cartItems.fold(0.0, (total, cartItem) => total + (cartItem.product.price * cartItem.quantity)).toStringAsFixed(2)}',
-                                    style: GoogleFonts.poppins(
-                                      fontSize: 24,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.black,
-                                    ),
-                                  ),
-                                  ElevatedButton(
-                                    onPressed: () {
-                                      ref
-                                          .read(cartProvider.notifier)
-                                          .clearCart();
+                            LayoutBuilder(
+                              builder: (context, constraints) {
+                                // Define responsive styles based on screen width
+                                double screenWidth =
+                                    MediaQuery.of(context).size.width;
+                                double fontSize = screenWidth <= 451 ? 7 : 18;
 
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        SnackBar(
-                                          content: Text(
-                                              'You have checked out \$${cartItems.fold(0.0, (total, cartItem) => total + (cartItem.product.price * cartItem.quantity)).toStringAsFixed(2)}!'),
-                                          backgroundColor: Colors.green,
-                                          duration: const Duration(seconds: 2),
-                                        ),
-                                      );
-                                    },
-                                    style: ElevatedButton.styleFrom(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 30, vertical: 15),
-                                      backgroundColor: Colors.white,
-                                      textStyle: const TextStyle(fontSize: 18),
-                                    ),
-                                    child: Text(
-                                      'Checkout',
-                                      style: GoogleFonts.poppins(
+                                return Container(
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 16),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        'Total: \$${cartItems.fold(0.0, (total, cartItem) => total + (cartItem.product.price * cartItem.quantity)).toStringAsFixed(2)}',
+                                        style: GoogleFonts.poppins(
+                                          fontSize: fontSize,
                                           fontWeight: FontWeight.bold,
-                                          color: Colors.black),
-                                    ),
+                                          color: Colors.black,
+                                        ),
+                                      ),
+                                      ElevatedButton(
+                                        onPressed: () {
+                                          ref
+                                              .read(cartProvider.notifier)
+                                              .clearCart();
+
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
+                                            SnackBar(
+                                              content: Text(
+                                                  'You have checked out \$${cartItems.fold(0.0, (total, cartItem) => total + (cartItem.product.price * cartItem.quantity)).toStringAsFixed(2)}!'),
+                                              backgroundColor: Colors.green,
+                                              duration:
+                                                  const Duration(seconds: 2),
+                                            ),
+                                          );
+                                        },
+                                        style: TextButton.styleFrom(
+                                          padding: EdgeInsets.symmetric(),
+                                          backgroundColor: Colors.white,
+                                          textStyle: TextStyle(),
+                                        ),
+                                        child: Text(
+                                          'Checkout',
+                                          style: GoogleFonts.poppins(
+                                            fontSize: fontSize,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                ],
-                              ),
-                            ),
+                                );
+                              },
+                            )
                           ],
                         ),
                       ),
