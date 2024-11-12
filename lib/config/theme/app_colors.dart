@@ -8,4 +8,5 @@ class AppColors {
   static const secondary = Color(0xffFF324B);
   static const darkSecondary = Color(0xff343434);
   static const grayText = Color(0xff797979);
+  static const warning = Color.fromARGB(255, 248, 161, 62);
 }

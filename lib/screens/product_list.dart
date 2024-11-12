@@ -44,7 +44,6 @@ class _ProductListState extends State<ProductListScreen> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 30),
                 Padding(
                   padding: const EdgeInsets.all(20),
                   child: TextField(
@@ -70,9 +69,8 @@ class _ProductListState extends State<ProductListScreen> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 30),
                 Padding(
-                  padding: const EdgeInsets.all(20),
+                  padding: const EdgeInsets.all(15),
                   child: GridView.builder(
                     gridDelegate:
                         const SliverGridDelegateWithFixedCrossAxisCount(

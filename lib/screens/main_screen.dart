@@ -5,6 +5,7 @@ import 'package:smart_shop_app/constant/navigation_items.dart';
 import 'package:smart_shop_app/screens/cart_screen.dart';
 import 'package:smart_shop_app/screens/home_screen.dart';
 import 'package:smart_shop_app/screens/product_list.dart';
+import 'package:smart_shop_app/screens/transaction_list_screen.dart';
 import 'package:smart_shop_app/screens/wishlist_screen.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:smart_shop_app/provider/navprovider.dart';
@@ -21,7 +22,7 @@ class MainScreen extends ConsumerWidget {
       const ProductListScreen(),
       const CartScreen(),
       const WishlistScreen(),
-      const HomeScreen(),
+      const TransactionListScreen(),
     ];
 
     return Scaffold(

@@ -1,9 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:smart_shop_app/constant/fruits_list.dart' as fruits;
 import 'package:smart_shop_app/provider/cartprovider.dart';
+import 'package:smart_shop_app/provider/navprovider.dart';
 import 'package:smart_shop_app/provider/wishlistprovider.dart' as provider;
 import 'package:hugeicons/hugeicons.dart';
 
@@ -77,14 +77,14 @@ class ProductDetailScreen extends ConsumerWidget {
                         children: [
                           Text(
                             product.name,
-                            style: GoogleFonts.poppins(
+                            style: TextStyle(
                               fontSize: 22,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
                           Text(
                             '\$ ${product.price} / kg',
-                            style: GoogleFonts.poppins(
+                            style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.normal,
                               color: const Color.fromARGB(255, 164, 162, 162),
@@ -128,7 +128,7 @@ class ProductDetailScreen extends ConsumerWidget {
                                       child: Center(
                                         child: Text(
                                           '$quantity',
-                                          style: GoogleFonts.poppins(
+                                          style: TextStyle(
                                             fontSize: 16,
                                             fontWeight: FontWeight.bold,
                                           ),
@@ -161,7 +161,7 @@ class ProductDetailScreen extends ConsumerWidget {
                                 ),
                                 Text(
                                   '\$ ${(product.price * quantity).toStringAsFixed(2)}',
-                                  style: GoogleFonts.poppins(
+                                  style: TextStyle(
                                     fontSize: 24,
                                     fontWeight: FontWeight.bold,
                                   ),
@@ -176,7 +176,7 @@ class ProductDetailScreen extends ConsumerWidget {
                               children: [
                                 Text(
                                   'Description',
-                                  style: GoogleFonts.poppins(
+                                  style: TextStyle(
                                     fontSize: 20,
                                     fontWeight: FontWeight.bold,
                                   ),
@@ -184,7 +184,7 @@ class ProductDetailScreen extends ConsumerWidget {
                                 ),
                                 Text(
                                   product.description,
-                                  style: GoogleFonts.poppins(
+                                  style: TextStyle(
                                     fontSize: 14,
                                     fontWeight: FontWeight.normal,
                                   ),
@@ -275,7 +275,7 @@ class ProductDetailScreen extends ConsumerWidget {
                                   ),
                                   child: Text(
                                     "Add to cart",
-                                    style: GoogleFonts.poppins(
+                                    style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,
                                       color: Colors.white,
@@ -299,11 +299,11 @@ class ProductDetailScreen extends ConsumerWidget {
   }
 }
 
-class CustomAppBar extends StatelessWidget {
+class CustomAppBar extends ConsumerWidget {
   const CustomAppBar({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Padding(
       padding: const EdgeInsets.all(10),
       child: Row(
@@ -311,20 +311,18 @@ class CustomAppBar extends StatelessWidget {
         children: [
           GestureDetector(
             onTap: () {
-              Navigator.pushNamed(context, "/main");
+              Navigator.pop(context);
             },
             child: Container(
-              width: 50,
-              height: 50,
+              width: 40,
+              height: 40,
               decoration: BoxDecoration(
                 color: Colors.white,
                 border: Border.all(
                   color: const Color(0xFFF5F5F5),
                   width: 1,
                 ),
-                borderRadius: const BorderRadius.all(
-                  Radius.circular(12),
-                ),
+                  shape: BoxShape.circle
               ),
               child: const Icon(
                 Icons.chevron_left,
@@ -333,24 +331,25 @@ class CustomAppBar extends StatelessWidget {
             ),
           ),
           GestureDetector(
-            onTap: () => Navigator.pushNamed(context, "/main"),
+            onTap: () => {
+              Navigator.pushNamed(context, "/main"),
+              ref.read(navigationProvider.notifier).updateIndex(2)
+            },
             child: Container(
-              width: 50,
-              height: 50,
+              width: 40,
+              height: 40,
               decoration: BoxDecoration(
                 color: Colors.white,
                 border: Border.all(
                   color: const Color(0xFFF5F5F5),
                   width: 1,
                 ),
-                borderRadius: const BorderRadius.all(
-                  Radius.circular(12),
-                ),
+                  shape: BoxShape.circle
               ),
               child: HugeIcon(
-                icon: HugeIcons.strokeRoundedHome07,
+                icon: HugeIcons.strokeRoundedShoppingBag03,
                 color: Colors.black,
-                size: 24.0,
+                size: 20.0,
               ),
             ),
           ),
@@ -359,5 +358,3 @@ class CustomAppBar extends StatelessWidget {
     );
   }
 }
-
-
