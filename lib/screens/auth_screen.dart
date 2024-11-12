@@ -90,7 +90,7 @@ class _AuthScreenState extends State<AuthScreen> {
     final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
 
     if (!emailRegex.hasMatch(value)) {
-      return 'Masukan email yang valid';
+      return 'Please input valid email!';
     }
     return null;
   }
