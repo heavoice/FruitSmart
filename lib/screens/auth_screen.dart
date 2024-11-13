@@ -53,11 +53,11 @@ class _AuthScreenState extends State<AuthScreen> {
       log(e.code);
       setState(() {
         if (e.code == 'invalid-credential') {
-          errorMessage = 'Email atau password salah!';
+          errorMessage = 'Incorrect email or password!';
         } else if (e.code == 'email-already-in-use') {
-          errorMessage = 'Email sudah terdaftar!';
+          errorMessage = 'Email already registered!';
         } else {
-          errorMessage = 'Terjadi kesalahan: ${e.message}';
+          errorMessage = 'Error occurred: ${e.message}';
         }
       });
 
@@ -66,7 +66,7 @@ class _AuthScreenState extends State<AuthScreen> {
       );
     } catch (error) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Terjadi kesalahan!')),
+        const SnackBar(content: Text('Error occurred!')),
       );
     } finally {
       setState(() {
@@ -85,7 +85,7 @@ class _AuthScreenState extends State<AuthScreen> {
 
   String? _validateEmail(String? value) {
     if (value == null || value.isEmpty) {
-      return 'Email harus diisi';
+      return 'Email is required';
     }
     final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
 
@@ -97,10 +97,10 @@ class _AuthScreenState extends State<AuthScreen> {
 
   String? _validatePassword(String? value) {
     if (value == null || value.isEmpty) {
-      return 'Password harus diisi';
+      return 'Password must be entered';
     }
     if (value.length < 6) {
-      return 'Password minimal 6 karakter';
+      return 'Password at least 6 characters';
     }
     return null;
   }
@@ -150,7 +150,7 @@ class _AuthScreenState extends State<AuthScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    _isLogin ? 'Masuk' : 'Daftar',
+                    _isLogin ? 'Sign In' : 'Create account',
                     textAlign: TextAlign.start,
                     style: const TextStyle(
                       fontSize: 24,
@@ -159,9 +159,7 @@ class _AuthScreenState extends State<AuthScreen> {
                     ),
                   ),
                   Text(
-                    _isLogin
-                        ? "Masuk untuk melanjutkan"
-                        : "Daftar untuk melanjutkan",
+                    _isLogin ? "Sign in to continue" : "Register to continue",
                     style: const TextStyle(
                       fontSize: 16,
                       color: AppColors.grayText,
@@ -197,7 +195,7 @@ class _AuthScreenState extends State<AuthScreen> {
                             errorStyle: const TextStyle(
                               fontWeight: FontWeight.w500,
                             ),
-                            hintText: 'Masukan email Anda!',
+                            hintText: 'Enter your email!',
                             hintStyle: TextStyle(
                               color: AppColors.grayText.withOpacity(0.5),
                               fontSize: 16,
@@ -237,7 +235,7 @@ class _AuthScreenState extends State<AuthScreen> {
                             errorStyle: const TextStyle(
                               fontWeight: FontWeight.w500,
                             ),
-                            hintText: 'Masukan password Anda!',
+                            hintText: 'Enter your password!',
                             hintStyle: TextStyle(
                               color: AppColors.grayText.withOpacity(0.5),
                               fontSize: 16,
@@ -267,7 +265,7 @@ class _AuthScreenState extends State<AuthScreen> {
                 onPressed: _submit,
                 isDisabled: !_isValidated,
                 isLoading: _isLoading,
-                title: _isLogin ? 'Masuk' : 'Daftar',
+                title: _isLogin ? 'Sign In' : 'Create account',
               ),
             ),
             const SizedBox(height: 20),
@@ -275,8 +273,8 @@ class _AuthScreenState extends State<AuthScreen> {
               child: RichText(
                 text: TextSpan(
                   text: _isLogin
-                      ? "Belum memiliki akun? "
-                      : "Sudah memiliki akun? ",
+                      ? "Don't have an account? "
+                      : "Already have an account? ",
                   style: const TextStyle(
                       color: AppColors.darkSecondary,
                       fontFamily: "Satoshi",
@@ -284,7 +282,7 @@ class _AuthScreenState extends State<AuthScreen> {
                       fontWeight: FontWeight.w500),
                   children: [
                     TextSpan(
-                      text: _isLogin ? "Daftar" : "Masuk",
+                      text: _isLogin ? "Create account" : "Sign In",
                       recognizer: TapGestureRecognizer()
                         ..onTap = () {
                           setState(() {

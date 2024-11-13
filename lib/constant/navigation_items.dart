@@ -27,7 +27,7 @@ List<NavigationItem> navigationItems = [
       color: AppColors.background,
       size: 24.0,
     ),
-    label: 'Produk',
+    label: 'Product',
   ),
   const NavigationItem(
     icon: HugeIcon(
@@ -35,7 +35,7 @@ List<NavigationItem> navigationItems = [
       color: AppColors.background,
       size: 24.0,
     ),
-    label: 'Keranjang',
+    label: 'Cart',
   ),
   const NavigationItem(
     icon: HugeIcon(
@@ -51,6 +51,6 @@ List<NavigationItem> navigationItems = [
       color: AppColors.background,
       size: 24.0,
     ),
-    label: 'Transaksi',
+    label: 'transaction',
   ),
 ];
