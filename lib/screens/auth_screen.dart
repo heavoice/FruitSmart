@@ -1,8 +1,9 @@
-// ignore_for_file: use_build_context_synchronously
+// ignore_for_file: use_build_context_synchronously, deprecated_member_use
 import 'dart:developer';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/services.dart';
 import 'package:smart_shop_app/config/images/app_images.dart';
 import 'package:smart_shop_app/config/theme/app_colors.dart';
 import 'package:smart_shop_app/screens/main_screen.dart';
@@ -21,6 +22,7 @@ class _AuthScreenState extends State<AuthScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
+  final _focusNode = FocusNode();
   bool _isLogin = true;
   bool _isValidated = false;
   bool _isLoading = false;
@@ -34,9 +36,11 @@ class _AuthScreenState extends State<AuthScreen> {
     _auth.authStateChanges().listen((User? user) {
       if (user != null) {
         // Navigate directly to MainScreen if already logged in
-        Navigator.of(context).pushReplacement(MaterialPageRoute(
-          builder: (context) => const MainScreen(),
-        ));
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (context) => const MainScreen(),
+          ),
+        );
       }
     });
 
@@ -63,24 +67,23 @@ class _AuthScreenState extends State<AuthScreen> {
         );
       }
 
-      Navigator.of(context).pushReplacement(MaterialPageRoute(
-        builder: (context) => const MainScreen(),
-      ));
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (context) => const MainScreen(),
+        ),
+      );
     } on FirebaseAuthException catch (e) {
-      // Show specific error messages
       log(e.code);
-      setState(() {
-        if (e.code == 'invalid-credential') {
-          errorMessage = 'Email atau password salah!';
-        } else if (e.code == 'email-already-in-use') {
-          errorMessage = 'Email sudah terdaftar!';
-        } else {
-          errorMessage = 'Terjadi kesalahan: ${e.message}';
-        }
-      });
-
+      String message;
+      if (e.code == 'invalid-credential') {
+        message = 'Email atau password salah!';
+      } else if (e.code == 'email-already-in-use') {
+        message = 'Email sudah terdaftar!';
+      } else {
+        message = 'Terjadi kesalahan: ${e.message}';
+      }
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(errorMessage)),
+        SnackBar(content: Text(message)),
       );
     } catch (error) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -95,7 +98,6 @@ class _AuthScreenState extends State<AuthScreen> {
 
   void _validateForm() {
     bool isValid = _formKey.currentState?.validate() ?? false;
-
     setState(() {
       _isValidated = isValid;
     });
@@ -106,7 +108,6 @@ class _AuthScreenState extends State<AuthScreen> {
       return 'Email harus diisi';
     }
     final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
-
     if (!emailRegex.hasMatch(value)) {
       return 'Please input valid email!';
     }
@@ -127,6 +128,7 @@ class _AuthScreenState extends State<AuthScreen> {
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
+    _focusNode.dispose();
     super.dispose();
   }
 
@@ -184,90 +186,99 @@ class _AuthScreenState extends State<AuthScreen> {
             const SizedBox(height: 30),
             SizedBox(
               width: double.infinity,
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          "Email",
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                            color: AppColors.darkSecondary,
-                          ),
-                        ),
-                        const SizedBox(height: 10),
-                        TextFormField(
-                          controller: _emailController,
-                          cursorColor: AppColors.primary,
-                          validator: _validateEmail,
-                          decoration: InputDecoration(
-                            errorStyle: const TextStyle(
-                              fontWeight: FontWeight.w500,
-                            ),
-                            hintText: 'Masukan email Anda!',
-                            hintStyle: TextStyle(
-                              color: AppColors.grayText.withOpacity(0.5),
+              child: RawKeyboardListener(
+                focusNode: _focusNode,
+                onKey: (RawKeyEvent event) {
+                  if (event.isKeyPressed(LogicalKeyboardKey.enter) &&
+                      _isValidated) {
+                    _submit();
+                  }
+                },
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            "Email",
+                            style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w500,
-                            ),
-                            filled: true,
-                            fillColor: Colors.grey[100],
-                            contentPadding: const EdgeInsets.symmetric(
-                                vertical: 16, horizontal: 16),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(30),
-                              borderSide: BorderSide.none,
+                              color: AppColors.darkSecondary,
                             ),
                           ),
-                          keyboardType: TextInputType.emailAddress,
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 16.0),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          "Password",
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                            color: AppColors.darkSecondary,
-                          ),
-                        ),
-                        const SizedBox(height: 10),
-                        TextFormField(
-                          controller: _passwordController,
-                          cursorColor: AppColors.primary,
-                          validator: _validatePassword,
-                          decoration: InputDecoration(
-                            errorStyle: const TextStyle(
-                              fontWeight: FontWeight.w500,
+                          const SizedBox(height: 10),
+                          TextFormField(
+                            controller: _emailController,
+                            cursorColor: AppColors.primary,
+                            validator: _validateEmail,
+                            decoration: InputDecoration(
+                              errorStyle: const TextStyle(
+                                fontWeight: FontWeight.w500,
+                              ),
+                              hintText: 'Masukan email Anda!',
+                              hintStyle: TextStyle(
+                                color: AppColors.grayText.withOpacity(0.5),
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                              ),
+                              filled: true,
+                              fillColor: Colors.grey[100],
+                              contentPadding: const EdgeInsets.symmetric(
+                                  vertical: 16, horizontal: 16),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(30),
+                                borderSide: BorderSide.none,
+                              ),
                             ),
-                            hintText: 'Masukan password Anda!',
-                            hintStyle: TextStyle(
-                              color: AppColors.grayText.withOpacity(0.5),
+                            keyboardType: TextInputType.emailAddress,
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16.0),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            "Password",
+                            style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w500,
-                            ),
-                            filled: true,
-                            fillColor: Colors.grey[100],
-                            contentPadding: const EdgeInsets.symmetric(
-                                vertical: 16, horizontal: 16),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(30),
-                              borderSide: BorderSide.none,
+                              color: AppColors.darkSecondary,
                             ),
                           ),
-                          obscureText: true,
-                        ),
-                      ],
-                    ),
-                  ],
+                          const SizedBox(height: 10),
+                          TextFormField(
+                            controller: _passwordController,
+                            cursorColor: AppColors.primary,
+                            validator: _validatePassword,
+                            decoration: InputDecoration(
+                              errorStyle: const TextStyle(
+                                fontWeight: FontWeight.w500,
+                              ),
+                              hintText: 'Masukan password Anda!',
+                              hintStyle: TextStyle(
+                                color: AppColors.grayText.withOpacity(0.5),
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                              ),
+                              filled: true,
+                              fillColor: Colors.grey[100],
+                              contentPadding: const EdgeInsets.symmetric(
+                                  vertical: 16, horizontal: 16),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(30),
+                                borderSide: BorderSide.none,
+                              ),
+                            ),
+                            obscureText: true,
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -296,21 +307,22 @@ class _AuthScreenState extends State<AuthScreen> {
                   children: [
                     TextSpan(
                       text: _isLogin ? "Daftar" : "Masuk",
+                      style: const TextStyle(
+                          color: AppColors.primary,
+                          fontFamily: "Satoshi",
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500),
                       recognizer: TapGestureRecognizer()
                         ..onTap = () {
                           setState(() {
                             _isLogin = !_isLogin;
                           });
                         },
-                      style: const TextStyle(
-                        color: AppColors.primary,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
+                    )
                   ],
                 ),
               ),
-            ),
+            )
           ],
         ),
       ),
