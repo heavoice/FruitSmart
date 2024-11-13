@@ -6,9 +6,25 @@ import 'package:smart_shop_app/constant/category_list.dart';
 import 'package:smart_shop_app/constant/coupon_list.dart';
 import 'package:smart_shop_app/constant/fruits_list.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:smart_shop_app/screens/auth_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
+
+  Future<void> _logOut(BuildContext context) async {
+    try {
+      await FirebaseAuth.instance.signOut();
+      // Navigate back to AuthScreen after signing out
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => const AuthScreen()),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to sign out: $e')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -60,7 +76,7 @@ class HomeScreen extends StatelessWidget {
                       ],
                     ),
                     ElevatedButton(
-                      onPressed: () => {},
+                      onPressed: () => _logOut(context),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.background,
                         shadowColor: Colors.transparent,
@@ -72,7 +88,7 @@ class HomeScreen extends StatelessWidget {
                         foregroundColor: AppColors.darkSecondary,
                       ),
                       child: const HugeIcon(
-                        icon: HugeIcons.strokeRoundedShoppingBag03,
+                        icon: HugeIcons.strokeRoundedLogout01,
                         color: Colors.black,
                         size: 24.0,
                       ),
