@@ -21,20 +21,20 @@ class CartScreen extends ConsumerWidget {
               toolbarHeight: 100,
               title: Padding(
                 padding: EdgeInsets.all(20),
-                child: Center(
-                  child: Text(
+                child: Row(children: [
+                  Text(
                     'Checkout',
                     style: TextStyle(
-                      color: AppColors.background,
-                      fontSize: 26,
+                      color: AppColors.darkBackground,
+                      fontSize: 22,
                       fontWeight: FontWeight.bold,
                       fontFamily: "Satoshi",
                     ),
                   ),
-                ),
+                ]),
               ),
               automaticallyImplyLeading: false,
-              backgroundColor: AppColors.primary,
+              backgroundColor: AppColors.background,
               elevation: 0,
               pinned: true,
             ),

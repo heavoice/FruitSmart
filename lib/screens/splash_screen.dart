@@ -79,7 +79,7 @@ class _SplashScreenState extends State<SplashScreen> {
       // ignore: use_build_context_synchronously
       context,
       MaterialPageRoute(
-        builder: (context) => const MainScreen(),
+        builder: (context) => const AuthScreen(),
       ),
     );
   }

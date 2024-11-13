@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hugeicons/hugeicons.dart';
 import 'package:smart_shop_app/config/theme/app_colors.dart';
 import 'package:smart_shop_app/provider/wishlistprovider.dart';
-import 'package:smart_shop_app/provider/navprovider.dart';
 
 class WishlistScreen extends ConsumerWidget {
   const WishlistScreen({super.key});
@@ -23,32 +21,20 @@ class WishlistScreen extends ConsumerWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  SizedBox(),
                   Text(
                     'Wishlist',
                     style: TextStyle(
-                      color: AppColors.background,
-                      fontSize: 26,
+                      color: AppColors.darkBackground,
+                      fontSize: 22,
                       fontWeight: FontWeight.bold,
                       fontFamily: "Satoshi",
-                    ),
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.pushNamed(context, '/main');
-                      ref.read(navigationProvider.notifier).updateIndex(2);
-                    },
-                    child: const HugeIcon(
-                      icon: HugeIcons.strokeRoundedFavourite,
-                      size: 32,
-                      color: Colors.white,
                     ),
                   ),
                 ],
               ),
             ),
             automaticallyImplyLeading: false,
-            backgroundColor: AppColors.primary,
+            backgroundColor: AppColors.background,
             elevation: 0,
             pinned: true,
           ),

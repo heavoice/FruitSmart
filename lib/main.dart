@@ -29,7 +29,7 @@ class SmartShopApp extends StatelessWidget {
         title: 'FruitSmart',
         debugShowCheckedModeBanner: false,
         theme: AppTheme.lightTheme,
-        home: const MainScreen(),
+        home: const SplashScreen(),
         routes: {
           '/auth': (context) => const AuthScreen(),
           "/home": (context) => const SplashScreen(),
