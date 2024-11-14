@@ -38,34 +38,118 @@ class WishlistScreen extends ConsumerWidget {
             elevation: 0,
             pinned: true,
           ),
-          SliverList(
-            delegate: SliverChildBuilderDelegate(
-              (context, index) {
-                final product = wishlist[index];
-                return Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Card(
-                    child: ListTile(
-                      leading: CircleAvatar(
-                        child: Text(product.name[0]),
-                      ),
-                      title: Text(product.name),
-                      subtitle: Text('\$${product.price.toStringAsFixed(2)}'),
-                      trailing: IconButton(
-                        icon: const Icon(Icons.delete),
-                        onPressed: () {
-                          ref
-                              .read(wishlistProvider.notifier)
-                              .removeProduct(product);
-                        },
+          wishlist.isEmpty
+              ? SliverFillRemaining(
+                  child: Center(
+                    child: Text(
+                      'Your wishlist is empty',
+                      style: TextStyle(
+                        fontSize: 18,
+                        color: Colors.grey,
                       ),
                     ),
                   ),
-                );
-              },
-              childCount: wishlist.length,
-            ),
-          ),
+                )
+              : SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                      final product = wishlist[index];
+                      bool isFavorite = wishlist.contains(product);
+
+                      return Container(
+                        color: Colors.white,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 35, vertical: 8),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const SizedBox(height: 20),
+                              Container(
+                                padding: const EdgeInsets.all(24),
+                                margin: const EdgeInsets.only(bottom: 10),
+                                decoration: BoxDecoration(
+                                  color: Colors.grey.withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        ClipOval(
+                                          child: Image.network(
+                                            product.image,
+                                            width: 34,
+                                            height: 34,
+                                            fit: BoxFit.cover,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 10),
+                                        Expanded(
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                product.name,
+                                                style: const TextStyle(
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                              Text(
+                                                product.description,
+                                                style: const TextStyle(
+                                                  fontFamily: 'Satoshi',
+                                                  fontSize: 16,
+                                                  color: Colors.grey,
+                                                ),
+                                                maxLines: 3,
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        const Spacer(),
+                                        IconButton(
+                                          icon: Icon(
+                                            isFavorite
+                                                ? Icons.favorite
+                                                : Icons.favorite_border,
+                                            color: isFavorite
+                                                ? Colors.red
+                                                : Colors.grey,
+                                          ),
+                                          onPressed: () {
+                                            if (isFavorite) {
+                                              ref
+                                                  .read(
+                                                      wishlistProvider.notifier)
+                                                  .removeProduct(product);
+                                            } else {
+                                              ref
+                                                  .read(
+                                                      wishlistProvider.notifier)
+                                                  .addProduct(product);
+                                            }
+                                          },
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                    childCount: wishlist.length,
+                  ),
+                ),
         ],
       ),
     );
