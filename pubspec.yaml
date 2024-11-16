@@ -19,6 +19,7 @@ dependencies:
   provider: ^6.1.2
   pigeon: ^22.6.0
   carousel_slider: ^5.0.0
+  flutter_dotenv: ^5.2.1
 
 dev_dependencies:
   flutter_test:
@@ -32,6 +33,7 @@ flutter:
   assets:
     - assets/img/
     - assets/fonts/
+    - .env
 
   fonts:
     - family: Satoshi

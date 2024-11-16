@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:smart_shop_app/config/theme/app_theme.dart';
 import 'package:smart_shop_app/screens/auth_screen.dart';
 import 'package:smart_shop_app/screens/main_screen.dart';
@@ -9,7 +10,11 @@ import 'package:smart_shop_app/screens/product_detail_screen.dart';
 import 'package:smart_shop_app/screens/product_list.dart';
 import 'package:smart_shop_app/screens/wishlist_screen.dart';
 
-void main() async {
+Future<void> main() async {
+  await dotenv.load(
+    fileName: ".env",
+  );
+
   runApp(const NeedifyApp());
 }
 
