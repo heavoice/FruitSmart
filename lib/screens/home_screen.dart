@@ -8,7 +8,6 @@ import 'package:smart_shop_app/constant/category_list.dart';
 import 'package:smart_shop_app/constant/coupon_list.dart';
 import 'package:smart_shop_app/constant/fruits_list.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:smart_shop_app/screens/auth_screen.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -16,7 +15,6 @@ class HomeScreen extends StatelessWidget {
 
   Future<void> _logOut(BuildContext context) async {
     try {
-      await FirebaseAuth.instance.signOut();
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (context) => const AuthScreen()),
       );

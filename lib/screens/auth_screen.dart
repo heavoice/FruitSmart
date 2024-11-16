@@ -1,8 +1,6 @@
 // ignore_for_file: use_build_context_synchronously, deprecated_member_use
-import 'dart:developer';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';
 import 'package:smart_shop_app/config/images/app_images.dart';
 import 'package:smart_shop_app/config/theme/app_colors.dart';
@@ -18,7 +16,6 @@ class AuthScreen extends StatefulWidget {
 }
 
 class _AuthScreenState extends State<AuthScreen> {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
@@ -32,18 +29,6 @@ class _AuthScreenState extends State<AuthScreen> {
   void initState() {
     super.initState();
 
-    // Check if a user is already signed in
-    _auth.authStateChanges().listen((User? user) {
-      if (user != null) {
-        // Navigate directly to MainScreen if already logged in
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(
-            builder: (context) => const MainScreen(),
-          ),
-        );
-      }
-    });
-
     _emailController.addListener(_validateForm);
     _passwordController.addListener(_validateForm);
   }
@@ -54,36 +39,14 @@ class _AuthScreenState extends State<AuthScreen> {
         _isLoading = true;
       });
       if (_isLogin) {
-        // Login
-        await _auth.signInWithEmailAndPassword(
-          email: _emailController.text,
-          password: _passwordController.text,
-        );
       } else {
         // Register
-        await _auth.createUserWithEmailAndPassword(
-          email: _emailController.text,
-          password: _passwordController.text,
-        );
       }
 
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
           builder: (context) => const MainScreen(),
         ),
-      );
-    } on FirebaseAuthException catch (e) {
-      log(e.code);
-      String message;
-      if (e.code == 'invalid-credential') {
-        message = 'Email atau password salah!';
-      } else if (e.code == 'email-already-in-use') {
-        message = 'Email sudah terdaftar!';
-      } else {
-        message = 'Terjadi kesalahan: ${e.message}';
-      }
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(message)),
       );
     } catch (error) {
       ScaffoldMessenger.of(context).showSnackBar(
