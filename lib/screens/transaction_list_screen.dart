@@ -37,11 +37,15 @@ class _TransactionList extends State<TransactionListScreen> {
                   padding: const EdgeInsets.all(20),
                   child: GridView.builder(
                     gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 1,
+                         SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: MediaQuery.of(context).size.width < 600
+                          ? 1
+                          : MediaQuery.of(context).size.width < 900
+                              ? 2
+                              : 3,
                       crossAxisSpacing: 20,
                       mainAxisSpacing: 20,
-                      childAspectRatio: 16 / 8,
+                      childAspectRatio: 16 / 9,
                     ),
                     itemCount: transactionList.length,
                     shrinkWrap: true,
@@ -74,7 +78,9 @@ class TransactionItem extends StatelessWidget {
       ),
       child: Column(
         children: [
-          Container(
+          Column(
+            children: [
+              Container(
             padding: const EdgeInsets.only(bottom: 8),
             decoration: BoxDecoration(
               border: Border(
@@ -148,7 +154,10 @@ class TransactionItem extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 10),
+         
+            ],
+          ),
+          Spacer(),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [

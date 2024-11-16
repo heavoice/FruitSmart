@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
@@ -15,7 +17,6 @@ class HomeScreen extends StatelessWidget {
   Future<void> _logOut(BuildContext context) async {
     try {
       await FirebaseAuth.instance.signOut();
-      // Navigate back to AuthScreen after signing out
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (context) => const AuthScreen()),
       );
