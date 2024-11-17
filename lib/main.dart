@@ -1,26 +1,31 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:smart_shop_app/config/theme/app_theme.dart';
 import 'package:smart_shop_app/screens/auth_screen.dart';
 import 'package:smart_shop_app/screens/main_screen.dart';
 import 'package:smart_shop_app/screens/splash_screen.dart';
-import 'firebase_options.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:smart_shop_app/screens/cart_screen.dart';
 import 'package:smart_shop_app/screens/product_detail_screen.dart';
 import 'package:smart_shop_app/screens/product_list.dart';
 import 'package:smart_shop_app/screens/wishlist_screen.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
+Future<void> main() async {
+  await dotenv.load(
+    fileName: ".env",
   );
-  runApp(const SmartShopApp());
+
+  await Supabase.initialize(
+    url: dotenv.env["DB_URL"] as String,
+    anonKey: dotenv.env["DB_API_KEY"] as String,
+  );
+
+  runApp(const NeedifyApp());
 }
 
-class SmartShopApp extends StatelessWidget {
-  const SmartShopApp({super.key});
+class NeedifyApp extends StatelessWidget {
+  const NeedifyApp({super.key});
 
   @override
   Widget build(BuildContext context) {

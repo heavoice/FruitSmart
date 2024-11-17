@@ -8,15 +8,23 @@ import 'package:smart_shop_app/constant/category_list.dart';
 import 'package:smart_shop_app/constant/coupon_list.dart';
 import 'package:smart_shop_app/constant/fruits_list.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:smart_shop_app/screens/auth_screen.dart';
+import 'package:smart_shop_app/service/auth/auth.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  User? currentUser = AuthService().getCurrentUser();
 
   Future<void> _logOut(BuildContext context) async {
     try {
-      await FirebaseAuth.instance.signOut();
+      await AuthService().logOut();
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (context) => const AuthScreen()),
       );
@@ -29,6 +37,7 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    
     return CustomScrollView(
       slivers: [
         SliverToBoxAdapter(
@@ -65,8 +74,8 @@ class HomeScreen extends StatelessWidget {
                                   color: AppColors.grayText.withOpacity(0.9),
                                   fontWeight: FontWeight.w500),
                             ),
-                            const Text(
-                              "John Doe",
+                            Text(
+                              currentUser!.userMetadata!["display_name"] ?? '-',
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
@@ -202,6 +211,10 @@ class HomeScreen extends StatelessWidget {
       ],
     );
   }
+}
+
+extension on Map<String, dynamic>? {
+  get display_name => null;
 }
 
 class CoupunCard extends StatelessWidget {
