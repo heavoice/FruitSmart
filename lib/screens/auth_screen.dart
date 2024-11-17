@@ -6,6 +6,8 @@ import 'package:smart_shop_app/config/images/app_images.dart';
 import 'package:smart_shop_app/config/theme/app_colors.dart';
 import 'package:smart_shop_app/screens/main_screen.dart';
 import 'package:smart_shop_app/widget/app_button.dart';
+import 'package:smart_shop_app/service/auth/auth.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
@@ -18,6 +20,7 @@ class AuthScreen extends StatefulWidget {
 class _AuthScreenState extends State<AuthScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _usernameController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   final _focusNode = FocusNode();
   bool _isLogin = true;
@@ -31,6 +34,7 @@ class _AuthScreenState extends State<AuthScreen> {
 
     _emailController.addListener(_validateForm);
     _passwordController.addListener(_validateForm);
+    _usernameController.addListener(_validateForm);
   }
 
   Future<void> _submit() async {
@@ -39,8 +43,12 @@ class _AuthScreenState extends State<AuthScreen> {
         _isLoading = true;
       });
       if (_isLogin) {
+        await AuthService()
+            .signInWithEmail(_emailController.text, _passwordController.text);
       } else {
         // Register
+        await AuthService().signUpWithEmail(_emailController.text,
+            _passwordController.text, _usernameController.text);
       }
 
       Navigator.of(context).pushReplacement(
@@ -48,9 +56,12 @@ class _AuthScreenState extends State<AuthScreen> {
           builder: (context) => const MainScreen(),
         ),
       );
-    } catch (error) {
+    } on AuthException catch (error) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Terjadi kesalahan!')),
+        SnackBar(
+          content: Text(error.message),
+          backgroundColor: Colors.red[600],
+        ),
       );
     } finally {
       setState(() {
@@ -68,7 +79,7 @@ class _AuthScreenState extends State<AuthScreen> {
 
   String? _validateEmail(String? value) {
     if (value == null || value.isEmpty) {
-      return 'Email harus diisi';
+      return 'Email should not be empty';
     }
     final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
     if (!emailRegex.hasMatch(value)) {
@@ -79,10 +90,20 @@ class _AuthScreenState extends State<AuthScreen> {
 
   String? _validatePassword(String? value) {
     if (value == null || value.isEmpty) {
-      return 'Password harus diisi';
+      return 'Password should not be empty';
     }
-    if (value.length < 6) {
-      return 'Password minimal 6 karakter';
+    if (value.length <= 6) {
+      return 'Password should be at least 6 characters';
+    }
+    return null;
+  }
+
+  String? _validateUsername(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Username should not be empty';
+    }
+    if (value.length <= 6) {
+      return 'Username should be at least 6 characters';
     }
     return null;
   }
@@ -91,6 +112,7 @@ class _AuthScreenState extends State<AuthScreen> {
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
+    _usernameController.dispose();
     _focusNode.dispose();
     super.dispose();
   }
@@ -104,29 +126,13 @@ class _AuthScreenState extends State<AuthScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: AppColors.primary.withOpacity(0.2),
-                shape: BoxShape.circle,
-              ),
-              child: SizedBox(
-                width: 70,
-                height: 70,
-                child: Image.asset(
-                  AppImages.logo,
-                  fit: BoxFit.cover,
-                ),
-              ),
-            ),
-            const SizedBox(height: 30),
             SizedBox(
               width: double.infinity,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    _isLogin ? 'Masuk' : 'Daftar',
+                    _isLogin ? 'Sign In' : 'Register',
                     textAlign: TextAlign.start,
                     style: const TextStyle(
                       fontSize: 24,
@@ -135,9 +141,7 @@ class _AuthScreenState extends State<AuthScreen> {
                     ),
                   ),
                   Text(
-                    _isLogin
-                        ? "Masuk untuk melanjutkan"
-                        : "Daftar untuk melanjutkan",
+                    _isLogin ? "Sign in to continue" : "Register to continue",
                     style: const TextStyle(
                       fontSize: 16,
                       color: AppColors.grayText,
@@ -146,7 +150,7 @@ class _AuthScreenState extends State<AuthScreen> {
                 ],
               ),
             ),
-            const SizedBox(height: 30),
+            const SizedBox(height: 20),
             SizedBox(
               width: double.infinity,
               child: RawKeyboardListener(
@@ -161,6 +165,47 @@ class _AuthScreenState extends State<AuthScreen> {
                   key: _formKey,
                   child: Column(
                     children: [
+                      if (!_isLogin)
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              "Username",
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                                color: AppColors.darkSecondary,
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            TextFormField(
+                              controller: _usernameController,
+                              cursorColor: AppColors.primary,
+                              validator: _validateUsername,
+                              decoration: InputDecoration(
+                                errorStyle: const TextStyle(
+                                  fontWeight: FontWeight.w500,
+                                ),
+                                hintText: 'Input your username!',
+                                hintStyle: TextStyle(
+                                  color: AppColors.grayText.withOpacity(0.5),
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                                filled: true,
+                                fillColor: Colors.grey[100],
+                                contentPadding: const EdgeInsets.symmetric(
+                                    vertical: 16, horizontal: 16),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(30),
+                                  borderSide: BorderSide.none,
+                                ),
+                              ),
+                              keyboardType: TextInputType.name,
+                            ),
+                          ],
+                        ),
+                      if (!_isLogin) const SizedBox(height: 10),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -181,7 +226,7 @@ class _AuthScreenState extends State<AuthScreen> {
                               errorStyle: const TextStyle(
                                 fontWeight: FontWeight.w500,
                               ),
-                              hintText: 'Masukan email Anda!',
+                              hintText: 'Input your email!',
                               hintStyle: TextStyle(
                                 color: AppColors.grayText.withOpacity(0.5),
                                 fontSize: 16,
@@ -200,7 +245,7 @@ class _AuthScreenState extends State<AuthScreen> {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 16.0),
+                      const SizedBox(height: 10),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -221,7 +266,7 @@ class _AuthScreenState extends State<AuthScreen> {
                               errorStyle: const TextStyle(
                                 fontWeight: FontWeight.w500,
                               ),
-                              hintText: 'Masukan password Anda!',
+                              hintText: 'Input your password!',
                               hintStyle: TextStyle(
                                 color: AppColors.grayText.withOpacity(0.5),
                                 fontSize: 16,
@@ -245,14 +290,56 @@ class _AuthScreenState extends State<AuthScreen> {
                 ),
               ),
             ),
-            const SizedBox(height: 40),
+            const SizedBox(height: 30),
             SizedBox(
               width: double.infinity,
               child: AppButton(
                 onPressed: _submit,
                 isDisabled: !_isValidated,
                 isLoading: _isLoading,
-                title: _isLogin ? 'Masuk' : 'Daftar',
+                title: _isLogin ? 'Sign In' : 'Register',
+              ),
+            ),
+            const SizedBox(height: 10),
+            const Text(
+              "Or",
+              style: TextStyle(
+                color: AppColors.grayText,
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            const SizedBox(height: 10),
+            SizedBox(
+              width: double.infinity,
+              child: TextButton(
+                style: TextButton.styleFrom(
+                  backgroundColor: AppColors.lightGrey.withOpacity(0.5),
+                  padding: const EdgeInsets.symmetric(vertical: 20),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                ),
+                onPressed: _submit,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Image.asset(
+                      AppImages.google,
+                      width: 20,
+                      height: 20,
+                    ),
+                    const SizedBox(width: 20),
+                    const Text(
+                      "Sign in with Google",
+                      style: TextStyle(
+                        color: AppColors.darkSecondary,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
             const SizedBox(height: 20),
@@ -260,8 +347,8 @@ class _AuthScreenState extends State<AuthScreen> {
               child: RichText(
                 text: TextSpan(
                   text: _isLogin
-                      ? "Belum memiliki akun? "
-                      : "Sudah memiliki akun? ",
+                      ? "Dont have an account yet? "
+                      : "Already have an account? ",
                   style: const TextStyle(
                       color: AppColors.darkSecondary,
                       fontFamily: "Satoshi",
@@ -269,7 +356,7 @@ class _AuthScreenState extends State<AuthScreen> {
                       fontWeight: FontWeight.w500),
                   children: [
                     TextSpan(
-                      text: _isLogin ? "Daftar" : "Masuk",
+                      text: _isLogin ? "Register" : "Login",
                       style: const TextStyle(
                           color: AppColors.primary,
                           fontFamily: "Satoshi",
@@ -277,6 +364,9 @@ class _AuthScreenState extends State<AuthScreen> {
                           fontWeight: FontWeight.w500),
                       recognizer: TapGestureRecognizer()
                         ..onTap = () {
+                          _emailController.clear();
+                          _passwordController.clear();
+                          _usernameController.clear();
                           setState(() {
                             _isLogin = !_isLogin;
                           });

@@ -9,10 +9,16 @@ import 'package:smart_shop_app/screens/cart_screen.dart';
 import 'package:smart_shop_app/screens/product_detail_screen.dart';
 import 'package:smart_shop_app/screens/product_list.dart';
 import 'package:smart_shop_app/screens/wishlist_screen.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 Future<void> main() async {
   await dotenv.load(
     fileName: ".env",
+  );
+
+  await Supabase.initialize(
+    url: dotenv.env["DB_URL"] as String,
+    anonKey: dotenv.env["DB_API_KEY"] as String,
   );
 
   runApp(const NeedifyApp());

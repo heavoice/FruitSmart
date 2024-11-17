@@ -5,6 +5,7 @@ import 'package:smart_shop_app/config/images/app_images.dart';
 import 'package:smart_shop_app/config/theme/app_colors.dart';
 import 'package:smart_shop_app/screens/auth_screen.dart';
 import 'package:smart_shop_app/screens/main_screen.dart';
+import 'package:smart_shop_app/service/auth/auth_gate.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -76,10 +77,9 @@ class _SplashScreenState extends State<SplashScreen> {
   Future<void> redirect() async {
     await Future.delayed(const Duration(seconds: 2));
     Navigator.pushReplacement(
-      // ignore: use_build_context_synchronously
       context,
       MaterialPageRoute(
-        builder: (context) => const AuthScreen(),
+        builder: (context) => const AuthGate(),
       ),
     );
   }
