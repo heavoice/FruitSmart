@@ -1,7 +1,9 @@
+import 'dart:developer';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:smart_shop_app/config/theme/app_colors.dart';
-import 'package:smart_shop_app/constant/fruits_list.dart';
+import 'package:smart_shop_app/service/products/products.dart';
 
 class ProductListScreen extends StatefulWidget {
   const ProductListScreen({super.key});
@@ -12,19 +14,21 @@ class ProductListScreen extends StatefulWidget {
 }
 
 class _ProductListState extends State<ProductListScreen> {
-  List<Product> filteredProduct = products;
-
-  filterProduct(String query) {
-    setState(() {
-      filteredProduct = products
-          .where((product) =>
-              product.name.toLowerCase().contains(query.toLowerCase()))
-          .toList();
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
+    final int rowCount = MediaQuery.of(context).size.width < 400
+        ? 1
+        : MediaQuery.of(context).size.width < 600
+            ? 2
+            : MediaQuery.of(context).size.width < 900
+                ? 3
+                : 4;
+
+    final _filterController = TextEditingController();
+    final ProductsService productsService = ProductsService(filter: "");
+
+    
+
     return Scaffold(
       backgroundColor: AppColors.background,
       body: CustomScrollView(
@@ -51,7 +55,10 @@ class _ProductListState extends State<ProductListScreen> {
                       fontSize: 16,
                     ),
                     cursorColor: AppColors.primary,
-                    onChanged: filterProduct,
+                    onChanged: (value) {
+                      _filterController.text = value;
+                      productsService.setFilter(value);
+                    },
                     decoration: InputDecoration(
                       filled: true,
                       hintText: 'Search',
@@ -71,27 +78,37 @@ class _ProductListState extends State<ProductListScreen> {
                 ),
                 Padding(
                   padding: const EdgeInsets.all(15),
-                  child: GridView.builder(
-                    gridDelegate:
-                         SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: MediaQuery.of(context).size.width < 400
-                          ? 1
-                          : MediaQuery.of(context).size.width < 600
-                              ? 2
-                              : MediaQuery.of(context).size.width < 900
-                                  ? 3
-                                  : 4,
-                      crossAxisSpacing: 20,
-                      mainAxisSpacing: 20,
-                      childAspectRatio: 0.7,
-                    ),
-                    itemCount: filteredProduct.length,
-                    shrinkWrap: true,
-                    physics:
-                        const NeverScrollableScrollPhysics(), // Menonaktifkan scrollbar
-                    itemBuilder: (context, index) =>
-                        ProductItem(product: filteredProduct[index]),
-                  ),
+                  child: FutureBuilder<List<Map<String, dynamic>>>(
+                      future: productsService.getAllProducts(),
+                      builder: (contex, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return const Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        }
+                        log(snapshot.data.toString());
+                        if (snapshot.hasData) {
+                          return GridView.builder(
+                            gridDelegate:
+                                SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: rowCount,
+                              crossAxisSpacing: 20,
+                              mainAxisSpacing: 20,
+                              childAspectRatio: 0.7,
+                            ),
+                            shrinkWrap: true,
+                            itemCount: 1,
+                            itemBuilder: (context, index) {
+                              final product = snapshot.data![index];
+                              return ProductItem(
+                                product: ProductData.fromMap(product),
+                              );
+                            },
+                          );
+                        }
+                        return Center(child: Text("No Products Found"));
+                      }),
                 ),
               ],
             ),
@@ -103,7 +120,7 @@ class _ProductListState extends State<ProductListScreen> {
 }
 
 class ProductItem extends StatelessWidget {
-  final Product product;
+  final ProductData product;
   const ProductItem({super.key, required this.product});
 
   @override
@@ -119,7 +136,7 @@ class ProductItem extends StatelessWidget {
       child: Container(
         width: (MediaQuery.of(context).size.width / 2) - 30,
         decoration: BoxDecoration(
-          color: Color(int.parse('0xFF${product.color}')),
+          color: Color(int.parse('0xFF${product.primary_color}')),
           borderRadius: BorderRadius.circular(20),
         ),
         child: Column(
@@ -132,7 +149,7 @@ class ProductItem extends StatelessWidget {
                     SizedBox(
                       width: double.infinity,
                       child: Text(
-                        product.name,
+                        product.name ?? "-",
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           color: Colors.black,
@@ -142,7 +159,7 @@ class ProductItem extends StatelessWidget {
                     SizedBox(
                       width: double.infinity,
                       child: Text(
-                        "\$ ${product.price} / kg",
+                        "\$ ${product.name} / kg",
                         style: const TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w500,
@@ -155,8 +172,8 @@ class ProductItem extends StatelessWidget {
               ),
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 10),
-                child: Image.asset(
-                  product.image,
+                child: Image.network(
+                  product.image ?? "-",
                   fit: BoxFit.contain,
                   width: 90,
                   height: 90,
@@ -165,13 +182,12 @@ class ProductItem extends StatelessWidget {
               Align(
                 alignment: Alignment.bottomRight,
                 child: TextButton(
-                  onPressed: () {
-                  },
+                  onPressed: () {},
                   style: TextButton.styleFrom(
                     padding: EdgeInsets.zero,
-                    minimumSize: const Size(45, 45), 
+                    minimumSize: const Size(45, 45),
                     backgroundColor: Color(
-                      int.parse('0xFF${product.secondaryColor}'),
+                      int.parse('0xFF${product.secondary_color}'),
                     ),
                     shape: const RoundedRectangleBorder(
                       borderRadius: BorderRadius.only(

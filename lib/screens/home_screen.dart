@@ -6,8 +6,8 @@ import 'package:hugeicons/hugeicons.dart';
 import 'package:smart_shop_app/config/theme/app_colors.dart';
 import 'package:smart_shop_app/constant/category_list.dart';
 import 'package:smart_shop_app/constant/coupon_list.dart';
-import 'package:smart_shop_app/constant/fruits_list.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:smart_shop_app/constant/fruits_list.dart';
 import 'package:smart_shop_app/screens/auth_screen.dart';
 import 'package:smart_shop_app/service/auth/auth.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -188,22 +188,22 @@ class _HomeScreenState extends State<HomeScreen> {
                 SizedBox(
                   height: 20,
                 ),
-                CarouselSlider(
-                  items: bestSellingProducts
-                      .map(
-                        (product) => BestSellingCard(
-                          product: product,
-                        ),
-                      )
-                      .toList(),
-                  options: CarouselOptions(
-                    height: 400,
-                    enableInfiniteScroll: false,
-                    disableCenter: false,
-                    aspectRatio: 2 / 3,
-                    viewportFraction: 0.9,
-                  ),
-                ),
+                // CarouselSlider(
+                //   items: bestSellingProducts
+                //       .map(
+                //         (product) => BestSellingCard(
+                //           product: product,
+                //         ),
+                //       )
+                //       .toList(),
+                //   options: CarouselOptions(
+                //     height: 400,
+                //     enableInfiniteScroll: false,
+                //     disableCenter: false,
+                //     aspectRatio: 2 / 3,
+                //     viewportFraction: 0.9,
+                //   ),
+                // ),
               ],
             ),
           ),
@@ -213,9 +213,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-extension on Map<String, dynamic>? {
-  get display_name => null;
-}
 
 class CoupunCard extends StatelessWidget {
   final Coupon coupon;
@@ -377,7 +374,7 @@ class BestSellingCard extends StatelessWidget {
                     SizedBox(
                       width: double.infinity,
                       child: Text(
-                        product.name,
+                        "product.name",
                         style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             color: Colors.black,
@@ -401,7 +398,7 @@ class BestSellingCard extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 10),
                 child: Image.asset(
-                  product.image,
+                  "product.image",
                   fit: BoxFit.contain,
                   width: 150,
                   height: 150,

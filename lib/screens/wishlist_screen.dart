@@ -79,7 +79,7 @@ class WishlistScreen extends ConsumerWidget {
                                       children: [
                                         ClipOval(
                                           child: Image.network(
-                                            product.image,
+                                            "product.image",
                                             width: 34,
                                             height: 34,
                                             fit: BoxFit.cover,
@@ -92,7 +92,7 @@ class WishlistScreen extends ConsumerWidget {
                                                 CrossAxisAlignment.start,
                                             children: [
                                               Text(
-                                                product.name,
+                                                " product.name",
                                                 style: const TextStyle(
                                                   fontSize: 18,
                                                   fontWeight: FontWeight.bold,
@@ -101,7 +101,7 @@ class WishlistScreen extends ConsumerWidget {
                                                 overflow: TextOverflow.ellipsis,
                                               ),
                                               Text(
-                                                product.description,
+                                                "product.description",
                                                 style: const TextStyle(
                                                   fontFamily: 'Satoshi',
                                                   fontSize: 16,
