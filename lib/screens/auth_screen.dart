@@ -99,9 +99,20 @@ class _AuthScreenState extends State<AuthScreen> {
   }
 
   String? _validateUsername(String? value) {
+    final specialCharRegex = RegExp(r'[!@#<>?":_`~;[\]\\|=+)(*&^%0-9-]');
+
     if (value == null || value.isEmpty) {
       return 'Username should not be empty';
     }
+
+    if (value.contains(" ")) {
+      return 'Username should not contain space';
+    }
+
+    if (specialCharRegex.hasMatch(value)) {
+      return 'Username should not contain special characters';
+    }
+
     if (value.length <= 6) {
       return 'Username should be at least 6 characters';
     }
