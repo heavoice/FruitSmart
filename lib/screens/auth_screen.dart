@@ -1,4 +1,5 @@
 // ignore_for_file: use_build_context_synchronously, deprecated_member_use
+import 'dart:io';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -8,6 +9,9 @@ import 'package:smart_shop_app/screens/main_screen.dart';
 import 'package:smart_shop_app/widget/app_button.dart';
 import 'package:smart_shop_app/service/auth/auth.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:smart_shop_app/service/profile/image.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
@@ -27,6 +31,7 @@ class _AuthScreenState extends State<AuthScreen> {
   bool _isValidated = false;
   bool _isLoading = false;
   String errorMessage = '';
+  XFile? _avatarImage;
 
   @override
   void initState() {
@@ -35,6 +40,36 @@ class _AuthScreenState extends State<AuthScreen> {
     _emailController.addListener(_validateForm);
     _passwordController.addListener(_validateForm);
     _usernameController.addListener(_validateForm);
+
+    _requestPermissionOnInit();
+  }
+
+  Future<void> _requestPermissionOnInit() async {
+    if (await Permission.storage.isDenied) {
+      await Permission.storage.request();
+    }
+  }
+
+  Future<void> _pickAvatar() async {
+    if (await Permission.storage.request().isGranted) {
+      final ImagePicker picker = ImagePicker();
+      final XFile? pickedImage =
+          await picker.pickImage(source: ImageSource.gallery);
+
+      if (pickedImage != null) {
+        setState(() {
+          _avatarImage = pickedImage;
+        });
+      }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content:
+              const Text('Storage permission is required to select an avatar.'),
+          backgroundColor: Colors.red[600],
+        ),
+      );
+    }
   }
 
   Future<void> _submit() async {
@@ -42,15 +77,38 @@ class _AuthScreenState extends State<AuthScreen> {
       setState(() {
         _isLoading = true;
       });
+
+      // Jika login
       if (_isLogin) {
         await AuthService()
             .signInWithEmail(_emailController.text, _passwordController.text);
       } else {
-        // Register
-        await AuthService().signUpWithEmail(_emailController.text,
-            _passwordController.text, _usernameController.text);
+        // Jika registrasi
+        final email = _emailController.text;
+
+        // Gunakan email sebagai userId
+        final userId = email;
+
+        // Setelah pendaftaran, lakukan login dan dapatkan userId dari email
+        await AuthService().signUpWithEmail(
+          email,
+          _passwordController.text,
+          _usernameController.text,
+        );
+
+        // Upload avatar jika ada
+        if (_avatarImage != null) {
+          final imageService = ImageService();
+          final imageUrl =
+              await imageService.uploadImage(File(_avatarImage!.path), userId);
+
+          if (imageUrl != null) {
+            await imageService.updateProfileImage(userId, imageUrl);
+          }
+        }
       }
 
+      // Setelah berhasil login atau register, pindah ke halaman utama
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
           builder: (context) => const MainScreen(),
@@ -177,45 +235,62 @@ class _AuthScreenState extends State<AuthScreen> {
                   child: Column(
                     children: [
                       if (!_isLogin)
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              "Username",
-                              style: TextStyle(
+                        GestureDetector(
+                          onTap: _pickAvatar,
+                          child: CircleAvatar(
+                            radius: 50,
+                            backgroundImage: _avatarImage != null
+                                ? FileImage(File(_avatarImage!.path))
+                                : null,
+                            child: _avatarImage == null
+                                ? const Icon(
+                                    Icons.person_add_alt_1,
+                                    size: 50,
+                                    color: Colors.grey,
+                                  )
+                                : null,
+                            backgroundColor: Colors.grey[200],
+                          ),
+                        ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            "Username",
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                              color: AppColors.darkSecondary,
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          TextFormField(
+                            controller: _usernameController,
+                            cursorColor: AppColors.primary,
+                            validator: _validateUsername,
+                            decoration: InputDecoration(
+                              errorStyle: const TextStyle(
+                                fontWeight: FontWeight.w500,
+                              ),
+                              hintText: 'Input your username!',
+                              hintStyle: TextStyle(
+                                color: AppColors.grayText.withOpacity(0.5),
                                 fontSize: 16,
                                 fontWeight: FontWeight.w500,
-                                color: AppColors.darkSecondary,
+                              ),
+                              filled: true,
+                              fillColor: Colors.grey[100],
+                              contentPadding: const EdgeInsets.symmetric(
+                                  vertical: 16, horizontal: 16),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(30),
+                                borderSide: BorderSide.none,
                               ),
                             ),
-                            const SizedBox(height: 10),
-                            TextFormField(
-                              controller: _usernameController,
-                              cursorColor: AppColors.primary,
-                              validator: _validateUsername,
-                              decoration: InputDecoration(
-                                errorStyle: const TextStyle(
-                                  fontWeight: FontWeight.w500,
-                                ),
-                                hintText: 'Input your username!',
-                                hintStyle: TextStyle(
-                                  color: AppColors.grayText.withOpacity(0.5),
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                                filled: true,
-                                fillColor: Colors.grey[100],
-                                contentPadding: const EdgeInsets.symmetric(
-                                    vertical: 16, horizontal: 16),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(30),
-                                  borderSide: BorderSide.none,
-                                ),
-                              ),
-                              keyboardType: TextInputType.name,
-                            ),
-                          ],
-                        ),
+                            keyboardType: TextInputType.name,
+                          ),
+                        ],
+                      ),
                       if (!_isLogin) const SizedBox(height: 10),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
