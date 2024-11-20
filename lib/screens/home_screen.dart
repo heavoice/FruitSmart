@@ -1,8 +1,8 @@
 // ignore_for_file: use_build_context_synchronously
-import 'dart:io';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smart_shop_app/config/theme/app_colors.dart';
 import 'package:smart_shop_app/constant/category_list.dart';
 import 'package:smart_shop_app/constant/coupon_list.dart';
@@ -11,7 +11,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:smart_shop_app/screens/auth_screen.dart';
 import 'package:smart_shop_app/service/auth/auth.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:image_picker/image_picker.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -22,7 +21,22 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   User? currentUser = AuthService().getCurrentUser();
-  XFile? _avatarImage;
+  String? _profileImageUrl;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadProfileImage();
+  }
+
+  // Ambil URL gambar dari shared_preferences
+  Future<void> _loadProfileImage() async {
+    final prefs = await SharedPreferences.getInstance();
+    final String? imageUrl = prefs.getString('profile_image_url');
+    setState(() {
+      _profileImageUrl = imageUrl;
+    });
+  }
 
   Future<void> _logOut(BuildContext context) async {
     try {
@@ -57,17 +71,22 @@ class _HomeScreenState extends State<HomeScreen> {
                           },
                           child: CircleAvatar(
                             radius: 30,
-                            backgroundImage: _avatarImage != null
-                                ? FileImage(File(_avatarImage!.path))
-                                : null,
-                            child: _avatarImage == null
+                            backgroundColor: Colors.grey[200],
+                            child: _profileImageUrl == null
                                 ? const Icon(
                                     Icons.person_add_alt_1,
                                     size: 30,
                                     color: Colors.grey,
                                   )
-                                : null,
-                            backgroundColor: Colors.grey[200],
+                                : ClipOval(
+                                    child: Image.network(
+                                      _profileImageUrl!,
+                                      width: 60, // Lebar oval
+                                      height: 60, // Tinggi oval
+                                      fit: BoxFit
+                                          .cover, // Mengatur gambar agar pas di dalam oval
+                                    ),
+                                  ),
                           ),
                         ),
                         const SizedBox(width: 20),

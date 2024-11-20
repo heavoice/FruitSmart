@@ -1,17 +1,20 @@
-// ignore_for_file: use_build_context_synchronously, deprecated_member_use
+// ignore_for_file: deprecated_member_use
+
 import 'dart:io';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:smart_shop_app/config/images/app_images.dart';
 import 'package:smart_shop_app/config/theme/app_colors.dart';
+import 'package:smart_shop_app/main.dart';
 import 'package:smart_shop_app/screens/main_screen.dart';
 import 'package:smart_shop_app/widget/app_button.dart';
 import 'package:smart_shop_app/service/auth/auth.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:smart_shop_app/service/profile/image.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
@@ -31,7 +34,8 @@ class _AuthScreenState extends State<AuthScreen> {
   bool _isValidated = false;
   bool _isLoading = false;
   String errorMessage = '';
-  XFile? _avatarImage;
+  Uint8List? _webImage;
+  File? _imageFile;
 
   @override
   void initState() {
@@ -40,35 +44,78 @@ class _AuthScreenState extends State<AuthScreen> {
     _emailController.addListener(_validateForm);
     _passwordController.addListener(_validateForm);
     _usernameController.addListener(_validateForm);
-
-    _requestPermissionOnInit();
   }
 
-  Future<void> _requestPermissionOnInit() async {
-    if (await Permission.storage.isDenied) {
-      await Permission.storage.request();
+  Future<void> _uploadImageToSupabase() async {
+    if (_webImage == null && _imageFile == null) {
+      debugPrint("Tidak ada gambar untuk diunggah");
+      return;
+    }
+
+    try {
+      // Nama file unik untuk gambar
+      final String fileName =
+          'avatar_${DateTime.now().millisecondsSinceEpoch}.png';
+      final String bucketPath = 'profiles/$fileName';
+
+      if (_webImage != null) {
+        // Jika berjalan di Web, gunakan _webImage (Uint8List)
+        await supabase.storage.from('profiles').uploadBinary(
+              bucketPath,
+              _webImage!,
+              fileOptions:
+                  const FileOptions(cacheControl: '3600', upsert: true),
+            );
+      } else if (_imageFile != null) {
+        // Jika berjalan di Mobile/Desktop, gunakan _imageFile (File)
+        await supabase.storage.from('profiles').upload(
+              bucketPath,
+              _imageFile!,
+              fileOptions:
+                  const FileOptions(cacheControl: '3600', upsert: true),
+            );
+      }
+
+      // Dapatkan URL publik dari gambar yang diunggah
+      final String publicUrl =
+          supabase.storage.from('profiles').getPublicUrl(bucketPath);
+
+      // Simpan URL gambar di shared_preferences
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('profile_image_url', publicUrl);
+
+      debugPrint('Gambar berhasil diunggah ke Supabase: $publicUrl');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Gambar berhasil diunggah: $publicUrl')),
+      );
+    } catch (e) {
+      debugPrint('Gagal mengunggah gambar: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Gagal mengunggah gambar')),
+      );
     }
   }
 
   Future<void> _pickAvatar() async {
-    if (await Permission.storage.request().isGranted) {
-      final ImagePicker picker = ImagePicker();
-      final XFile? pickedImage =
-          await picker.pickImage(source: ImageSource.gallery);
+    final ImagePicker picker = ImagePicker();
+    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
 
-      if (pickedImage != null) {
+    if (image != null) {
+      if (kIsWeb) {
+        // Web: Baca gambar sebagai byte
+        final Uint8List imageBytes = await image.readAsBytes();
         setState(() {
-          _avatarImage = pickedImage;
+          _webImage = imageBytes;
+        });
+      } else {
+        // Mobile/Desktop: Gunakan objek File
+        setState(() {
+          _imageFile = File(image.path);
         });
       }
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content:
-              const Text('Storage permission is required to select an avatar.'),
-          backgroundColor: Colors.red[600],
-        ),
-      );
+
+      // Setelah gambar dipilih, unggah ke Supabase
+      await _uploadImageToSupabase();
     }
   }
 
@@ -80,6 +127,7 @@ class _AuthScreenState extends State<AuthScreen> {
 
       // Jika login
       if (_isLogin) {
+        // Login with email and password
         await AuthService()
             .signInWithEmail(_emailController.text, _passwordController.text);
       } else {
@@ -97,12 +145,14 @@ class _AuthScreenState extends State<AuthScreen> {
         );
 
         // Upload avatar jika ada
-        if (_avatarImage != null) {
+        if (_imageFile != null) {
           final imageService = ImageService();
+          // Upload the image to Supabase storage
           final imageUrl =
-              await imageService.uploadImage(File(_avatarImage!.path), userId);
+              await imageService.uploadImage(File(_imageFile!.path), userId);
 
           if (imageUrl != null) {
+            // Update the profile image URL if image upload is successful
             await imageService.updateProfileImage(userId, imageUrl);
           }
         }
@@ -115,9 +165,18 @@ class _AuthScreenState extends State<AuthScreen> {
         ),
       );
     } on AuthException catch (error) {
+      // Handle authentication error
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(error.message),
+          backgroundColor: Colors.red[600],
+        ),
+      );
+    } catch (e) {
+      // Handle any general errors (e.g., image upload errors)
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Something went wrong: $e'),
           backgroundColor: Colors.red[600],
         ),
       );
@@ -239,17 +298,21 @@ class _AuthScreenState extends State<AuthScreen> {
                           onTap: _pickAvatar,
                           child: CircleAvatar(
                             radius: 50,
-                            backgroundImage: _avatarImage != null
-                                ? FileImage(File(_avatarImage!.path))
-                                : null,
-                            child: _avatarImage == null
+                            backgroundColor: Colors.grey[200],
+                            backgroundImage: _webImage != null
+                                ? MemoryImage(_webImage!)
+                                    as ImageProvider<Object>?
+                                : _imageFile != null
+                                    ? FileImage(_imageFile!)
+                                        as ImageProvider<Object>?
+                                    : null,
+                            child: _webImage == null && _imageFile == null
                                 ? const Icon(
                                     Icons.person_add_alt_1,
                                     size: 50,
                                     color: Colors.grey,
                                   )
                                 : null,
-                            backgroundColor: Colors.grey[200],
                           ),
                         ),
                       Column(
