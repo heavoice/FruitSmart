@@ -1,6 +1,8 @@
+// ignore_for_file: use_build_context_synchronously
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smart_shop_app/config/theme/app_colors.dart';
 import 'package:smart_shop_app/constant/coupon_list.dart';
 import 'package:flutter/cupertino.dart';
@@ -20,6 +22,22 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   User? currentUser = AuthService().getCurrentUser();
   CategoriesService categoriesService = CategoriesService();
+  String? _profileImageUrl;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadProfileImage();
+  }
+
+  // Ambil URL gambar dari shared_preferences
+  Future<void> _loadProfileImage() async {
+    final prefs = await SharedPreferences.getInstance();
+    final String? imageUrl = prefs.getString('profile_image_url');
+    setState(() {
+      _profileImageUrl = imageUrl;
+    });
+  }
 
   Future<void> _logOut(BuildContext context) async {
     try {
@@ -48,17 +66,28 @@ class _HomeScreenState extends State<HomeScreen> {
                   children: [
                     Row(
                       children: [
-                        Container(
-                          width: 50,
-                          height: 50,
-                          decoration: BoxDecoration(
-                            color: AppColors.lightGrey.withOpacity(0.4),
-                            shape: BoxShape.circle,
-                          ),
-                          child: const HugeIcon(
-                            icon: HugeIcons.strokeRoundedUser,
-                            color: Colors.black,
-                            size: 24.0,
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.pushNamed(context, 'profile');
+                          },
+                          child: CircleAvatar(
+                            radius: 30,
+                            backgroundColor: Colors.grey[200],
+                            child: _profileImageUrl == null
+                                ? const Icon(
+                                    Icons.person_add_alt_1,
+                                    size: 30,
+                                    color: Colors.grey,
+                                  )
+                                : ClipOval(
+                                    child: Image.network(
+                                      _profileImageUrl!,
+                                      width: 60, // Lebar oval
+                                      height: 60, // Tinggi oval
+                                      fit: BoxFit
+                                          .cover, // Mengatur gambar agar pas di dalam oval
+                                    ),
+                                  ),
                           ),
                         ),
                         const SizedBox(width: 20),
@@ -242,6 +271,11 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
+extension on Map<String, dynamic>? {
+  // ignore: unused_element
+  get display_name => null;
+}
+
 class CoupunCard extends StatelessWidget {
   final Coupon coupon;
   const CoupunCard({super.key, required this.coupon});
@@ -337,8 +371,6 @@ class CategoryItem extends StatelessWidget {
     return Column(
       children: [
         Container(
-          width: 60,
-          height: 60,
           decoration: BoxDecoration(
             color: AppColors.lightGrey.withOpacity(0.4),
             shape: BoxShape.circle,
@@ -388,7 +420,7 @@ class CategorySkeleton extends StatelessWidget {
           ),
         ),
         SizedBox(
-          height: 10,
+          height: 5,
         ),
         Container(
           width: 60,

@@ -4,6 +4,7 @@ import 'package:smart_shop_app/config/theme/app_theme.dart';
 import 'package:smart_shop_app/screens/auth_screen.dart';
 import 'package:smart_shop_app/screens/main_screen.dart';
 import 'package:smart_shop_app/screens/product_list.dart';
+import 'package:smart_shop_app/screens/profile_screen.dart';
 import 'package:smart_shop_app/screens/splash_screen.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:smart_shop_app/screens/cart_screen.dart';
@@ -26,6 +27,8 @@ Future<void> main() async {
   runApp(const NeedifyApp());
 }
 
+final supabase = Supabase.instance.client;
+
 class NeedifyApp extends StatelessWidget {
   const NeedifyApp({super.key});
 
@@ -45,6 +48,7 @@ class NeedifyApp extends StatelessWidget {
           '/cart': (context) => const CartScreen(),
           '/wishlist': (context) => const WishlistScreen(),
           "/main": (context) => const MainScreen(),
+          'profile': (context) => ProfileScreen(),
         },
       ),
     );
