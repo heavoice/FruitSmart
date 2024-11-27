@@ -1,15 +1,13 @@
-// ignore_for_file: use_build_context_synchronously
-
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:smart_shop_app/config/theme/app_colors.dart';
-import 'package:smart_shop_app/constant/category_list.dart';
 import 'package:smart_shop_app/constant/coupon_list.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:smart_shop_app/constant/fruits_list.dart';
 import 'package:smart_shop_app/screens/auth_screen.dart';
 import 'package:smart_shop_app/service/auth/auth.dart';
+import 'package:smart_shop_app/service/categories/categories.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -21,6 +19,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   User? currentUser = AuthService().getCurrentUser();
+  CategoriesService categoriesService = CategoriesService();
 
   Future<void> _logOut(BuildContext context) async {
     try {
@@ -37,7 +36,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    
     return CustomScrollView(
       slivers: [
         SliverToBoxAdapter(
@@ -152,14 +150,45 @@ class _HomeScreenState extends State<HomeScreen> {
                 SizedBox(
                   height: 20,
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    for (var category in categoryList)
-                      CategoryCarousel(
-                        category: category,
-                      )
-                  ],
+                FutureBuilder(
+                  future: categoriesService.getAllCategories(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return GridView.builder(
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 4,
+                        ),
+                        itemCount: 4,
+                        shrinkWrap: true,
+                        itemBuilder: (context, index) {
+                          return CategorySkeleton();
+                        },
+                      );
+                    }
+
+                    if (snapshot.hasData) {
+                      if (snapshot.data!.length == 0) {
+                        return Center(child: Text("No Categories Found"));
+                      }
+
+                      return GridView.builder(
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 4,
+                        ),
+                        itemCount: snapshot.data!.length,
+                        shrinkWrap: true,
+                        itemBuilder: (context, index) {
+                          return CategoryItem(
+                            category: Category.fromMap(
+                              snapshot.data![index],
+                            ),
+                          );
+                        },
+                      );
+                    }
+
+                    return Text("No Categories Found");
+                  },
                 ),
                 SizedBox(
                   height: 20,
@@ -212,7 +241,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 }
-
 
 class CoupunCard extends StatelessWidget {
   final Coupon coupon;
@@ -299,10 +327,10 @@ class CoupunCard extends StatelessWidget {
   }
 }
 
-class CategoryCarousel extends StatelessWidget {
-  final CategoryItem category;
+class CategoryItem extends StatelessWidget {
+  final Category category;
 
-  const CategoryCarousel({super.key, required this.category});
+  const CategoryItem({super.key, required this.category});
 
   @override
   Widget build(BuildContext context) {
@@ -319,8 +347,8 @@ class CategoryCarousel extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Image.asset(
-                category.image,
+              Image.network(
+                category.thumbnail_url!,
                 width: 30,
                 height: 30,
                 fit: BoxFit.contain,
@@ -332,11 +360,42 @@ class CategoryCarousel extends StatelessWidget {
           height: 10,
         ),
         Text(
-          category.title,
+          category.name!,
           style: TextStyle(
             color: AppColors.darkSecondary,
             fontSize: 14,
             fontWeight: FontWeight.w500,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class CategorySkeleton extends StatelessWidget {
+  const CategorySkeleton({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Container(
+          width: 60,
+          height: 60,
+          decoration: BoxDecoration(
+            color: AppColors.lightGrey.withOpacity(0.4),
+            shape: BoxShape.circle,
+          ),
+        ),
+        SizedBox(
+          height: 10,
+        ),
+        Container(
+          width: 60,
+          height: 12,
+          decoration: BoxDecoration(
+            color: AppColors.lightGrey.withOpacity(0.4),
+            borderRadius: BorderRadius.circular(5),
           ),
         ),
       ],

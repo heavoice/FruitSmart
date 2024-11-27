@@ -19,7 +19,7 @@ class MainScreen extends ConsumerWidget {
 
     final screens = [
       const HomeScreen(),
-      const ProductListScreen(),
+      ProductListScreen(),
       const CartScreen(),
       const WishlistScreen(),
       const TransactionListScreen(),

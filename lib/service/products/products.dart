@@ -1,20 +1,19 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ProductsService {
-  final String filter;
+  String filter;
 
   ProductsService({required this.filter}) {
     print("Filter: $filter");
   }
 
-  setFilter(String filter) {
-    print("Filter: $filter");
-  }
-
-  getAllProducts() {
-    return Supabase.instance.client
+  Future<List<Map<String, dynamic>>> getAllProducts() async {
+    final response = await Supabase.instance.client
         .from("products")
-        .select("*, categories(name)");
+        .select("*, categories(name)")
+        .ilike('name', '%$filter%');
+
+    return response;
   }
 }
 

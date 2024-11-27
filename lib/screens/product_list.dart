@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:smart_shop_app/config/theme/app_colors.dart';
@@ -14,6 +12,8 @@ class ProductListScreen extends StatefulWidget {
 }
 
 class _ProductListState extends State<ProductListScreen> {
+  String _filter = "";
+  
   @override
   Widget build(BuildContext context) {
     final int rowCount = MediaQuery.of(context).size.width < 400
@@ -24,10 +24,8 @@ class _ProductListState extends State<ProductListScreen> {
                 ? 3
                 : 4;
 
-    final _filterController = TextEditingController();
-    final ProductsService productsService = ProductsService(filter: "");
+    final ProductsService productsService = ProductsService(filter: _filter);
 
-    
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -55,14 +53,17 @@ class _ProductListState extends State<ProductListScreen> {
                       fontSize: 16,
                     ),
                     cursorColor: AppColors.primary,
-                    onChanged: (value) {
-                      _filterController.text = value;
-                      productsService.setFilter(value);
+                    onSubmitted: (value) {
+                      setState(() {
+                        _filter = value;
+                      });
                     },
                     decoration: InputDecoration(
                       filled: true,
                       hintText: 'Search',
-                      prefixIcon: const Icon(Icons.search),
+                      suffixIcon: Icon(
+                        Icons.search,
+                      ),
                       fillColor: const Color(0xFFF5F5F5),
                       border: InputBorder.none,
                       focusedBorder: OutlineInputBorder(
@@ -83,12 +84,6 @@ class _ProductListState extends State<ProductListScreen> {
                       builder: (contex, snapshot) {
                         if (snapshot.connectionState ==
                             ConnectionState.waiting) {
-                          return const Center(
-                            child: CircularProgressIndicator(),
-                          );
-                        }
-                        log(snapshot.data.toString());
-                        if (snapshot.hasData) {
                           return GridView.builder(
                             gridDelegate:
                                 SliverGridDelegateWithFixedCrossAxisCount(
@@ -98,7 +93,32 @@ class _ProductListState extends State<ProductListScreen> {
                               childAspectRatio: 0.7,
                             ),
                             shrinkWrap: true,
-                            itemCount: 1,
+                            itemCount: 5,
+                            itemBuilder: (context, index) {
+                              return Container(
+                                  decoration: BoxDecoration(
+                                color: AppColors.lightGrey.withOpacity(0.4),
+                                borderRadius: BorderRadius.circular(20),
+                              ));
+                            },
+                          );
+                        }
+
+                        if (snapshot.hasData) {
+                          if (snapshot.data!.length == 0) {
+                            return Center(child: Text("No Products Found"));
+                          }
+
+                          return GridView.builder(
+                            gridDelegate:
+                                SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: rowCount,
+                              crossAxisSpacing: 20,
+                              mainAxisSpacing: 20,
+                              childAspectRatio: 0.7,
+                            ),
+                            shrinkWrap: true,
+                            itemCount: snapshot.data!.length,
                             itemBuilder: (context, index) {
                               final product = snapshot.data![index];
                               return ProductItem(
@@ -107,6 +127,8 @@ class _ProductListState extends State<ProductListScreen> {
                             },
                           );
                         }
+
+                        
                         return Center(child: Text("No Products Found"));
                       }),
                 ),
@@ -134,7 +156,6 @@ class ProductItem extends StatelessWidget {
         );
       },
       child: Container(
-        width: (MediaQuery.of(context).size.width / 2) - 30,
         decoration: BoxDecoration(
           color: Color(int.parse('0xFF${product.primary_color}')),
           borderRadius: BorderRadius.circular(20),
@@ -159,7 +180,7 @@ class ProductItem extends StatelessWidget {
                     SizedBox(
                       width: double.infinity,
                       child: Text(
-                        "\$ ${product.name} / kg",
+                        "\$ ${product.price} / kg",
                         style: const TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w500,
