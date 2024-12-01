@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:smart_shop_app/constant/fruits_list.dart';
 
-final quantityProvider = StateProvider<int>((ref) => 0);
+final quantityProvider = StateProvider<int>((ref) => 1);
 
 class CartItem {
   final Product product;

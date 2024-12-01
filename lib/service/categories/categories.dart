@@ -2,7 +2,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 class CategoriesService {
   Future<List<Map<String, dynamic>>> getAllCategories() async {
-    return await Supabase.instance.client.from("categories").select().limit(4);
+    return await Supabase.instance.client.from("categories").select().limit(5);
   }
 }
 

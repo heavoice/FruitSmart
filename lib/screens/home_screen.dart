@@ -1,4 +1,6 @@
 // ignore_for_file: use_build_context_synchronously
+import 'dart:developer';
+
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
@@ -6,10 +8,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smart_shop_app/config/theme/app_colors.dart';
 import 'package:smart_shop_app/constant/coupon_list.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:smart_shop_app/constant/fruits_list.dart';
 import 'package:smart_shop_app/screens/auth_screen.dart';
 import 'package:smart_shop_app/service/auth/auth.dart';
 import 'package:smart_shop_app/service/categories/categories.dart';
+import 'package:smart_shop_app/service/products/products.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -22,6 +24,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   User? currentUser = AuthService().getCurrentUser();
   CategoriesService categoriesService = CategoriesService();
+  ProductsService productsService = ProductsService();
   String? _profileImageUrl;
 
   @override
@@ -181,6 +184,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 FutureBuilder(
                   future: categoriesService.getAllCategories(),
+                  initialData: [],
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return GridView.builder(
@@ -200,19 +204,22 @@ class _HomeScreenState extends State<HomeScreen> {
                         return Center(child: Text("No Categories Found"));
                       }
 
-                      return GridView.builder(
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 4,
+                      return CarouselSlider(
+                        options: CarouselOptions(
+                          height: 100,
+                          enableInfiniteScroll: false,
+                          disableCenter: true,
+                          aspectRatio: 1 / 1,
+                          viewportFraction: 0.3,
+                          padEnds: false,
                         ),
-                        itemCount: snapshot.data!.length,
-                        shrinkWrap: true,
-                        itemBuilder: (context, index) {
-                          return CategoryItem(
-                            category: Category.fromMap(
-                              snapshot.data![index],
-                            ),
-                          );
-                        },
+                        items: snapshot.data!
+                            .map(
+                              (category) => CategoryItem(
+                                category: Category.fromMap(category),
+                              ),
+                            )
+                            .toList(),
                       );
                     }
 
@@ -246,22 +253,60 @@ class _HomeScreenState extends State<HomeScreen> {
                 SizedBox(
                   height: 20,
                 ),
-                // CarouselSlider(
-                //   items: bestSellingProducts
-                //       .map(
-                //         (product) => BestSellingCard(
-                //           product: product,
-                //         ),
-                //       )
-                //       .toList(),
-                //   options: CarouselOptions(
-                //     height: 400,
-                //     enableInfiniteScroll: false,
-                //     disableCenter: false,
-                //     aspectRatio: 2 / 3,
-                //     viewportFraction: 0.9,
-                //   ),
-                // ),
+                FutureBuilder(
+                  future: productsService.getBestProducts(),
+                  initialData: [],
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return CarouselSlider(
+                        items: [1, 2, 3, 4]
+                            .map(
+                              (data) => Container(
+                                margin: EdgeInsets.only(right: 20),
+                                decoration: BoxDecoration(
+                                  color: AppColors.lightGrey.withOpacity(0.4),
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                              ),
+                            )
+                            .toList(),
+                        options: CarouselOptions(
+                          height: 400,
+                          enableInfiniteScroll: false,
+                          disableCenter: false,
+                          aspectRatio: 2 / 3,
+                          viewportFraction: 0.9,
+                        ),
+                      );
+                    }
+
+                    if (snapshot.hasData) {
+                      log(snapshot.data.toString());
+                      if (snapshot.data!.length == 0) {
+                        return Center(child: Text("No Categories Found"));
+                      }
+
+                      return CarouselSlider(
+                        items: snapshot.data!
+                            .map(
+                              (product) => BestSellingCard(
+                                product: ProductData.fromMap(product),
+                              ),
+                            )
+                            .toList(),
+                        options: CarouselOptions(
+                          height: 400,
+                          enableInfiniteScroll: false,
+                          disableCenter: false,
+                          aspectRatio: 2 / 3,
+                          viewportFraction: 0.9,
+                        ),
+                      );
+                    }
+
+                    return Text("No Best Product Found");
+                  },
+                ),
               ],
             ),
           ),
@@ -371,6 +416,8 @@ class CategoryItem extends StatelessWidget {
     return Column(
       children: [
         Container(
+          width: 60,
+          height: 60,
           decoration: BoxDecoration(
             color: AppColors.lightGrey.withOpacity(0.4),
             shape: BoxShape.circle,
@@ -398,6 +445,8 @@ class CategoryItem extends StatelessWidget {
             fontSize: 14,
             fontWeight: FontWeight.w500,
           ),
+          softWrap: true,
+          overflow: TextOverflow.ellipsis,
         ),
       ],
     );
@@ -436,7 +485,7 @@ class CategorySkeleton extends StatelessWidget {
 }
 
 class BestSellingCard extends StatelessWidget {
-  final Product product;
+  final ProductData product;
   const BestSellingCard({super.key, required this.product});
 
   @override
@@ -446,13 +495,13 @@ class BestSellingCard extends StatelessWidget {
         Navigator.pushNamed(
           context,
           '/detail',
-          arguments: product,
+          arguments: product.id,
         );
       },
       child: Container(
         margin: EdgeInsets.only(right: 20),
         decoration: BoxDecoration(
-          color: Color(int.parse('0xFF${product.color}')),
+          color: Color(int.parse('0xFF${product.primary_color}')),
           borderRadius: BorderRadius.circular(20),
         ),
         child: Column(
@@ -465,7 +514,7 @@ class BestSellingCard extends StatelessWidget {
                     SizedBox(
                       width: double.infinity,
                       child: Text(
-                        "product.name",
+                        product.name as String,
                         style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             color: Colors.black,
@@ -483,40 +532,54 @@ class BestSellingCard extends StatelessWidget {
                         ),
                       ),
                     ),
+                   
                   ],
                 ),
               ),
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 10),
-                child: Image.asset(
-                  "product.image",
+                child: Image.network(
+                  product.image ?? "-",
                   fit: BoxFit.contain,
                   width: 150,
                   height: 150,
                 ),
               ),
-              Align(
-                alignment: Alignment.bottomRight,
-                child: TextButton(
-                  onPressed: () {},
-                  style: TextButton.styleFrom(
-                    padding: EdgeInsets.zero,
-                    minimumSize: const Size(60, 60),
-                    backgroundColor: Color(
-                      int.parse('0xFF${product.secondaryColor}'),
-                    ),
-                    shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(20),
-                        bottomRight: Radius.circular(20),
+              Padding(
+                padding: const EdgeInsets.only(left: 20),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "${product.totalSold} Sold",
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
-                  ),
-                  child: const Icon(
-                    CupertinoIcons.heart_fill,
-                    color: Colors.white,
-                    size: 24,
-                  ),
+                    TextButton(
+                      onPressed: () {},
+                      style: TextButton.styleFrom(
+                        padding: EdgeInsets.zero,
+                        minimumSize: const Size(60, 60),
+                        backgroundColor: Color(
+                          int.parse('0xFF${product.secondary_color}'),
+                        ),
+                        shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(20),
+                            bottomRight: Radius.circular(20),
+                          ),
+                        ),
+                      ),
+                      child: const Icon(
+                        CupertinoIcons.heart_fill,
+                        color: Colors.white,
+                        size: 24,
+                      ),
+                    ),
+                  ],
                 ),
               )
             ]),

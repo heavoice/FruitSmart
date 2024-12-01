@@ -1,17 +1,40 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ProductsService {
-  String filter;
+  late String? filter = "";
 
-  ProductsService({required this.filter}) {
-    print("Filter: $filter");
-  }
+  ProductsService({this.filter});
 
   Future<List<Map<String, dynamic>>> getAllProducts() async {
     final response = await Supabase.instance.client
         .from("products")
-        .select("*, categories(name)")
+        .select(
+          "id, primary_color, secondary_color, name, description, price, image, total_sold",
+        )
         .ilike('name', '%$filter%');
+
+    return response;
+  }
+
+  Future<List<Map<String, dynamic>>> getBestProducts() async {
+    final response = await Supabase.instance.client
+        .from("products")
+        .select(
+          "id, primary_color, secondary_color, name, description, price, image, total_sold",
+        )
+        .order("total_sold", ascending: true);
+
+    return response;
+  }
+
+  Future<Map<String, dynamic>> getProductById(int id) async {
+    final response = await Supabase.instance.client
+        .from("products")
+        .select(
+          "*",
+        )
+        .eq('id', id)
+        .single();
 
     return response;
   }
@@ -21,21 +44,23 @@ class ProductData {
   final int? id;
   final String? name;
   final String? description;
-  final double price;
+  final double? price;
   final String? primary_color;
   final String? secondary_color;
-  final int category_id;
+  final int? category_id;
   final String? image;
+  final int? totalSold;
 
   ProductData(
-      {required this.id,
-      required this.name,
-      required this.description,
-      required this.price,
-      required this.primary_color,
-      required this.secondary_color,
-      required this.category_id,
-      required this.image});
+      {this.id,
+      this.name,
+      this.description,
+      this.price,
+      this.primary_color,
+      this.secondary_color,
+      this.category_id,
+      this.image,
+      this.totalSold});
 
   // convert map -> product
 
@@ -50,18 +75,7 @@ class ProductData {
         primary_color: map['primary_color'],
         secondary_color: map['secondary_color'],
         category_id: map['category_id'],
-        image: map["image"]);
+        image: map["image"],
+        totalSold: map["total_sold"]);
   }
-
-  // convert product -> map
-
-  // Map<String, dynamic> toMap() {
-  //   return {
-  //     'name': name,
-  //     'description': description,
-  //     'price': price,
-  //     "primary_color": primary_color,
-  //     "secondary_color": secondary_color
-  //   };
-  // }
 }

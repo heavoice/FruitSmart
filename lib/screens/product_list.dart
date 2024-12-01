@@ -17,7 +17,7 @@ class _ProductListState extends State<ProductListScreen> {
   @override
   Widget build(BuildContext context) {
     final int rowCount = MediaQuery.of(context).size.width < 400
-        ? 1
+        ? 2
         : MediaQuery.of(context).size.width < 600
             ? 2
             : MediaQuery.of(context).size.width < 900
@@ -152,7 +152,7 @@ class ProductItem extends StatelessWidget {
         Navigator.pushNamed(
           context,
           '/detail',
-          arguments: product,
+          arguments: product.id,
         );
       },
       child: Container(
@@ -200,28 +200,41 @@ class ProductItem extends StatelessWidget {
                   height: 90,
                 ),
               ),
-              Align(
-                alignment: Alignment.bottomRight,
-                child: TextButton(
-                  onPressed: () {},
-                  style: TextButton.styleFrom(
-                    padding: EdgeInsets.zero,
-                    minimumSize: const Size(45, 45),
-                    backgroundColor: Color(
-                      int.parse('0xFF${product.secondary_color}'),
-                    ),
-                    shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(20),
-                        bottomRight: Radius.circular(20),
+              Padding(
+                padding: const EdgeInsets.only(left: 20),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "${product.totalSold} Sold",
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
-                  ),
-                  child: const Icon(
-                    CupertinoIcons.heart_fill,
-                    color: Colors.white,
-                    size: 18,
-                  ),
+                    TextButton(
+                      onPressed: () {},
+                      style: TextButton.styleFrom(
+                        padding: EdgeInsets.zero,
+                        minimumSize: const Size(45, 45),
+                        backgroundColor: Color(
+                          int.parse('0xFF${product.secondary_color}'),
+                        ),
+                        shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(20),
+                            bottomRight: Radius.circular(20),
+                          ),
+                        ),
+                      ),
+                      child: const Icon(
+                        CupertinoIcons.heart_fill,
+                        color: Colors.white,
+                        size: 16,
+                      ),
+                    ),
+                  ],
                 ),
               )
             ]),
