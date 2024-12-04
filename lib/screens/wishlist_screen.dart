@@ -1,14 +1,20 @@
+import 'dart:developer';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:smart_shop_app/config/theme/app_colors.dart';
-import 'package:smart_shop_app/provider/wishlistprovider.dart';
+import 'package:smart_shop_app/service/wishlist/wishlist_service.dart';
 
-class WishlistScreen extends ConsumerWidget {
+class WishlistScreen extends StatefulWidget {
   const WishlistScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final wishlist = ref.watch(wishlistProvider);
+  State<WishlistScreen> createState() => _WishlistScreenState();
+}
+
+class _WishlistScreenState extends State<WishlistScreen> {
+  @override
+  Widget build(BuildContext context) {
+    final wishlist = WishlistService().getWishlist();
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -36,122 +42,115 @@ class WishlistScreen extends ConsumerWidget {
             automaticallyImplyLeading: false,
             backgroundColor: AppColors.background,
             elevation: 0,
-            pinned: true,
+            pinned: false,
           ),
-          wishlist.isEmpty
-              ? SliverFillRemaining(
+          FutureBuilder(
+            future: wishlist,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return SliverToBoxAdapter(
                   child: Center(
-                    child: Text(
-                      'Your wishlist is empty',
-                      style: TextStyle(
-                        fontSize: 18,
-                        color: Colors.grey,
+                    child: CircularProgressIndicator(),
+                  ),
+                );
+              }
+
+              log(snapshot.data.toString());
+              final data = snapshot.data;
+
+              if (data == null || data.isEmpty) {
+                return SliverToBoxAdapter(
+                  child: SizedBox(
+                    height: MediaQuery.of(context).size.height - 200,
+                    child: Center(
+                      child: Text(
+                        'No Wishlist Found',
+                        style: TextStyle(fontSize: 16),
                       ),
                     ),
                   ),
-                )
-              : SliverList(
+                );
+              }
+
+              if (snapshot.hasData) {
+                return SliverList(
                   delegate: SliverChildBuilderDelegate(
                     (context, index) {
-                      final product = wishlist[index];
-                      bool isFavorite = wishlist.contains(product);
-
-                      return Container(
-                        color: Colors.white,
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 35, vertical: 8),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const SizedBox(height: 20),
-                              Container(
-                                padding: const EdgeInsets.all(24),
-                                margin: const EdgeInsets.only(bottom: 10),
-                                decoration: BoxDecoration(
-                                  color: Colors.grey.withOpacity(0.1),
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        ClipOval(
-                                          child: Image.network(
-                                            "product.image",
-                                            width: 34,
-                                            height: 34,
-                                            fit: BoxFit.cover,
-                                          ),
-                                        ),
-                                        const SizedBox(width: 10),
-                                        Expanded(
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                " product.name",
-                                                style: const TextStyle(
-                                                  fontSize: 18,
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                                maxLines: 1,
-                                                overflow: TextOverflow.ellipsis,
-                                              ),
-                                              Text(
-                                                "product.description",
-                                                style: const TextStyle(
-                                                  fontFamily: 'Satoshi',
-                                                  fontSize: 16,
-                                                  color: Colors.grey,
-                                                ),
-                                                maxLines: 3,
-                                                overflow: TextOverflow.ellipsis,
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        const Spacer(),
-                                        IconButton(
-                                          icon: Icon(
-                                            isFavorite
-                                                ? Icons.favorite
-                                                : Icons.favorite_border,
-                                            color: isFavorite
-                                                ? Colors.red
-                                                : Colors.grey,
-                                          ),
-                                          onPressed: () {
-                                            if (isFavorite) {
-                                              ref
-                                                  .read(
-                                                      wishlistProvider.notifier)
-                                                  .removeProduct(product);
-                                            } else {
-                                              ref
-                                                  .read(
-                                                      wishlistProvider.notifier)
-                                                  .addProduct(product);
-                                            }
-                                          },
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              )
-                            ],
-                          ),
+                      return ListTile(
+                          title: Container(
+                        decoration: BoxDecoration(
+                          color: AppColors.lightGrey.withOpacity(0.3),
+                          borderRadius: BorderRadius.circular(5),
                         ),
-                      );
+                        padding: EdgeInsets.all(20),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(children: [
+                              Image.network(
+                                data[index]['product_id']['image'],
+                                width: 50,
+                                height: 50,
+                              ),
+                              SizedBox(width: 15),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    data[index]['product_id']['name'],
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  Text(
+                                    '\$ ${data[index]['product_id']['price']}',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ]),
+                            TextButton(
+                                onPressed: () {
+                                  WishlistService().removeWishlist(
+                                      data[index]['product_id']['id']);
+                                  setState(() {});
+                                },
+                                style: TextButton.styleFrom(
+                                  padding: EdgeInsets.zero,
+                                  minimumSize: const Size(45, 45),
+                                  shape: const RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.only(
+                                      topLeft: Radius.circular(20),
+                                      bottomRight: Radius.circular(20),
+                                    ),
+                                  ),
+                                ),
+                                child: Icon(
+                                  CupertinoIcons.heart_fill,
+                                  color: Colors.pink.shade300,
+                                  size: 22,
+                                ))
+                          ],
+                        ),
+                      ));
                     },
-                    childCount: wishlist.length,
+                    childCount: data.length,
                   ),
-                ),
+                );
+              }
+
+              return Text(
+                'No Wishlist Found',
+              );
+            },
+          )
         ],
       ),
     );
   }
 }
+

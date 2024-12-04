@@ -1,26 +1,26 @@
 import 'dart:developer';
 
 import 'package:smart_shop_app/main.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:smart_shop_app/service/products/products.dart';
 
 class Wishlist {
   final int id;
-  final int product_id;
+  final ProductData product;
   final int user_id;
 
-  Wishlist({required this.id, required this.product_id, required this.user_id});
+  Wishlist({required this.id, required this.product, required this.user_id});
 
   factory Wishlist.fromMap(Map<String, dynamic> map) {
     return Wishlist(
       id: map['id'],
-      product_id: map['product_id'],
+      product: map['product'],
       user_id: map['user_id'],
     );
   }
 }
 
 class WishlistService {
-  SupabaseStreamBuilder? getWishlist() {
+  Future<List<Map<String, dynamic>>>? getWishlist() {
     final currentUser = supabase.auth.currentUser;
 
     if (currentUser == null) {
@@ -29,7 +29,8 @@ class WishlistService {
 
     final res = supabase
         .from("wishlist")
-        .stream(primaryKey: ["id"]).eq("user_id", currentUser.id);
+        .select("* , product_id(*)")
+        .eq("user_id", currentUser.id);
 
     return res;
   }
