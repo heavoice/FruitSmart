@@ -1,10 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:smart_shop_app/constant/fruits_list.dart';
+import 'package:smart_shop_app/service/products/products.dart';
 
 final quantityProvider = StateProvider<int>((ref) => 1);
 
 class CartItem {
-  final Product product;
+  final ProductData product;
   int quantity;
 
   CartItem({required this.product, this.quantity = 1});
@@ -13,7 +13,7 @@ class CartItem {
 class CartProvider extends StateNotifier<List<CartItem>> {
   CartProvider() : super([]);
 
-  void addToCart(Product product, int quantity) {
+  void addToCart(ProductData product, int quantity) {
     final existingItemIndex = state.indexWhere(
       (item) => item.product.id == product.id,
     );
@@ -28,7 +28,7 @@ class CartProvider extends StateNotifier<List<CartItem>> {
     }
   }
 
-  void removeFromCart(Product product) {
+  void removeFromCart(ProductData product) {
     state = state.where((item) => item.product.id != product.id).toList();
   }
 

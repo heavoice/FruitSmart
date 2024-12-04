@@ -216,7 +216,6 @@ class _AuthScreenState extends State<AuthScreen> {
       if (value == null) {
         return 'Password should not be empty';
       }
-      log(value.length.toString());
       if (value.length <= 4) {
         return 'Password should be at least 6 characters';
       }

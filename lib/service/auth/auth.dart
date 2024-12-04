@@ -12,7 +12,6 @@ class AuthService {
   Future<bool> isEmailRegistered(String email) async {
     try {
       final res = await db.from('users').select().eq('email', email).single();
-      log(res.toString());
       if (res.isNotEmpty) {
         return true;
       } else {

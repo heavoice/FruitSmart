@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:smart_shop_app/config/theme/app_colors.dart';
 import 'package:smart_shop_app/service/products/products.dart';
+import 'package:smart_shop_app/service/wishlist/wishlist_service.dart';
 
 class ProductListScreen extends StatefulWidget {
   const ProductListScreen({super.key});
@@ -13,7 +14,7 @@ class ProductListScreen extends StatefulWidget {
 
 class _ProductListState extends State<ProductListScreen> {
   String _filter = "";
-  
+
   @override
   Widget build(BuildContext context) {
     final int rowCount = MediaQuery.of(context).size.width <= 360
@@ -25,7 +26,6 @@ class _ProductListState extends State<ProductListScreen> {
                 : 4;
 
     final ProductsService productsService = ProductsService(filter: _filter);
-
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -115,7 +115,7 @@ class _ProductListState extends State<ProductListScreen> {
                               crossAxisCount: rowCount,
                               crossAxisSpacing: 20,
                               mainAxisSpacing: 20,
-                              childAspectRatio: 0.8,
+                              childAspectRatio: 0.7,
                             ),
                             shrinkWrap: true,
                             itemCount: snapshot.data!.length,
@@ -128,7 +128,6 @@ class _ProductListState extends State<ProductListScreen> {
                           );
                         }
 
-                        
                         return Center(child: Text("No Products Found"));
                       }),
                 ),
@@ -141,23 +140,30 @@ class _ProductListState extends State<ProductListScreen> {
   }
 }
 
-class ProductItem extends StatelessWidget {
+class ProductItem extends StatefulWidget {
   final ProductData product;
   const ProductItem({super.key, required this.product});
 
   @override
+  State<ProductItem> createState() => _ProductItemState();
+}
+
+class _ProductItemState extends State<ProductItem> {
+  @override
   Widget build(BuildContext context) {
+    final isInWishlist = WishlistService().isInWishlist(widget.product.id);
+
     return GestureDetector(
       onTap: () {
         Navigator.pushNamed(
           context,
           '/detail',
-          arguments: product.id,
+          arguments: widget.product.id,
         );
       },
       child: Container(
         decoration: BoxDecoration(
-          color: Color(int.parse('0xFF${product.primary_color}')),
+          color: Color(int.parse('0xFF${widget.product.primary_color}')),
           borderRadius: BorderRadius.circular(20),
         ),
         child: Column(
@@ -170,7 +176,7 @@ class ProductItem extends StatelessWidget {
                     SizedBox(
                       width: double.infinity,
                       child: Text(
-                        product.name ?? "-",
+                        widget.product.name ?? "-",
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           color: Colors.black,
@@ -180,7 +186,7 @@ class ProductItem extends StatelessWidget {
                     SizedBox(
                       width: double.infinity,
                       child: Text(
-                        "\$ ${product.price} / kg",
+                        "\$ ${widget.product.price} / kg",
                         style: const TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w500,
@@ -194,7 +200,7 @@ class ProductItem extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 10),
                 child: Image.network(
-                  product.image ?? "-",
+                  widget.product.image ?? "-",
                   fit: BoxFit.contain,
                   width: 90,
                   height: 90,
@@ -206,33 +212,55 @@ class ProductItem extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      "${product.totalSold} Sold",
+                      "${widget.product.totalSold} Sold",
                       style: TextStyle(
                         color: Colors.black,
                         fontSize: 12,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
-                    TextButton(
-                      onPressed: () {},
-                      style: TextButton.styleFrom(
-                        padding: EdgeInsets.zero,
-                        minimumSize: const Size(45, 45),
-                        backgroundColor: Color(
-                          int.parse('0xFF${product.secondary_color}'),
-                        ),
-                        shape: const RoundedRectangleBorder(
-                          borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(20),
-                            bottomRight: Radius.circular(20),
-                          ),
-                        ),
-                      ),
-                      child: const Icon(
-                        CupertinoIcons.heart_fill,
-                        color: Colors.white,
-                        size: 16,
-                      ),
+                    FutureBuilder(
+                      future: isInWishlist,
+                      builder: (context, snapshot) {
+                        return TextButton(
+                            onPressed: () {
+                              if (snapshot.connectionState ==
+                                  ConnectionState.done) {
+                                if (snapshot.data == true) {
+                                  WishlistService()
+                                      .removeWishlist(widget.product.id);
+                                  setState(() {});
+                                } else {
+                                  WishlistService()
+                                      .addWishlist(widget.product.id);
+                                  setState(() {});
+                                }
+                              } else {
+                                return null;
+                              }
+                            },
+                            style: TextButton.styleFrom(
+                              padding: EdgeInsets.zero,
+                              minimumSize: const Size(45, 45),
+                              backgroundColor: Color(
+                                int.parse(
+                                    '0xFF${widget.product.secondary_color}'),
+                              ),
+                              shape: const RoundedRectangleBorder(
+                                borderRadius: BorderRadius.only(
+                                  topLeft: Radius.circular(20),
+                                  bottomRight: Radius.circular(20),
+                                ),
+                              ),
+                            ),
+                            child: Icon(
+                              snapshot.data == true
+                                  ? CupertinoIcons.heart_fill
+                                  : CupertinoIcons.heart,
+                              color: Colors.white,
+                              size: 16,
+                            ));
+                      },
                     ),
                   ],
                 ),

@@ -22,8 +22,9 @@ Future<void> main() async {
   );
 
   await Supabase.initialize(
-    url: dotenv.env["DB_URL"] as String,
-    anonKey: dotenv.env["DB_API_KEY"] as String,
+    url: "https://giklwkgxdezeqlzbohxf.supabase.co",
+    anonKey:
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdpa2x3a2d4ZGV6ZXFsemJvaHhmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzMyNzgwMjYsImV4cCI6MjA0ODg1NDAyNn0.tRShy64KNkB2acq3fiNsnOwnnAxMyNcyiYinS-Aj6CY",
   );
 
   runApp(const NeedifyApp());

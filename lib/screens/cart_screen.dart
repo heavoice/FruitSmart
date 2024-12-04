@@ -64,7 +64,7 @@ class CartScreen extends ConsumerWidget {
                                       children: [
                                         ClipOval(
                                           child: Image.network(
-                                            cartItem.product.image,
+                                            cartItem.product.image ?? "",
                                             width: 34,
                                             height: 34,
                                             fit: BoxFit.cover,
@@ -76,7 +76,7 @@ class CartScreen extends ConsumerWidget {
                                               CrossAxisAlignment.start,
                                           children: [
                                             Text(
-                                              cartItem.product.name,
+                                              cartItem.product.name ?? "",
                                               style: const TextStyle(
                                                 fontSize: 18,
                                                 fontWeight: FontWeight.bold,
@@ -94,7 +94,7 @@ class CartScreen extends ConsumerWidget {
                                         ),
                                         const Spacer(), // This pushes the next widget to the far right
                                         Text(
-                                          'Total: \$${(cartItem.quantity * cartItem.product.price).toStringAsFixed(2)}',
+                                          'Total: \$${(cartItem.quantity * (cartItem.product.price ?? 0)).toStringAsFixed(2)}',
                                           style: const TextStyle(
                                             fontSize: 16,
                                             fontWeight: FontWeight.bold,
@@ -162,7 +162,7 @@ class CartScreen extends ConsumerWidget {
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
-                                    'Total: \$${cartItems.fold(0.0, (total, cartItem) => total + (cartItem.product.price * cartItem.quantity)).toStringAsFixed(2)}',
+                                    'Total: \$${cartItems.fold(0.0, (total, cartItem) => total + ((cartItem.product.price ?? 0) * cartItem.quantity)).toStringAsFixed(2)}',
                                     style: TextStyle(
                                       fontSize: fontSize,
                                       fontWeight: FontWeight.bold,
@@ -179,7 +179,7 @@ class CartScreen extends ConsumerWidget {
                                           .showSnackBar(
                                         SnackBar(
                                           content: Text(
-                                              'You have checked out \$${cartItems.fold(0.0, (total, cartItem) => total + (cartItem.product.price * cartItem.quantity)).toStringAsFixed(2)}!'),
+                                              'You have checked out \$${cartItems.fold(0.0, (total, cartItem) => total + (cartItem.product.price ?? 0 * cartItem.quantity)).toStringAsFixed(2)}!'),
                                           backgroundColor: Colors.green,
                                           duration: const Duration(seconds: 2),
                                         ),
