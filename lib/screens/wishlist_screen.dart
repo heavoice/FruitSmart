@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:smart_shop_app/config/theme/app_colors.dart';
@@ -55,7 +54,6 @@ class _WishlistScreenState extends State<WishlistScreen> {
                 );
               }
 
-              log(snapshot.data.toString());
               final data = snapshot.data;
 
               if (data == null || data.isEmpty) {

@@ -1,4 +1,4 @@
-# FruitSmart
+# Needify
 
 A new Flutter project.
 

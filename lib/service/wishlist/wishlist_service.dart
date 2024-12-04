@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:smart_shop_app/main.dart';
 import 'package:smart_shop_app/service/products/products.dart';
 
@@ -46,7 +44,6 @@ class WishlistService {
         .eq('user_id', currentUser.id)
         .eq('product_id', productId);
 
-    log(res.toString());
 
     if (res.isEmpty) {
       return false;
