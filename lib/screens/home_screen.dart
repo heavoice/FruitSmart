@@ -1,62 +1,41 @@
 // ignore_for_file: use_build_context_synchronously
 import 'dart:developer';
-
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hugeicons/hugeicons.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smart_shop_app/config/theme/app_colors.dart';
 import 'package:smart_shop_app/constant/coupon_list.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:smart_shop_app/provider/navprovider.dart';
 import 'package:smart_shop_app/screens/auth_screen.dart';
 import 'package:smart_shop_app/service/auth/auth.dart';
 import 'package:smart_shop_app/service/categories/categories.dart';
 import 'package:smart_shop_app/service/products/products.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final currentUser = AuthService().getCurrentUser();
+    final categoriesService = CategoriesService();
+    final productsService = ProductsService();
 
-class _HomeScreenState extends State<HomeScreen> {
-  User? currentUser = AuthService().getCurrentUser();
-  CategoriesService categoriesService = CategoriesService();
-  ProductsService productsService = ProductsService();
-  String? _profileImageUrl;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadProfileImage();
-  }
-
-  // Ambil URL gambar dari shared_preferences
-  Future<void> _loadProfileImage() async {
-    final prefs = await SharedPreferences.getInstance();
-    final String? imageUrl = prefs.getString('profile_image_url');
-    setState(() {
-      _profileImageUrl = imageUrl;
-    });
-  }
-
-  Future<void> _logOut(BuildContext context) async {
-    try {
-      await AuthService().logOut();
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => const AuthScreen()),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to sign out: $e')),
-      );
+ 
+    Future<void> _logOut(BuildContext context) async {
+      try {
+        await AuthService().logOut();
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (context) => const AuthScreen()),
+        );
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to sign out: $e')),
+        );
+      }
     }
-  }
 
-  @override
-  Widget build(BuildContext context) {
     return CustomScrollView(
       slivers: [
         SliverToBoxAdapter(
@@ -76,21 +55,12 @@ class _HomeScreenState extends State<HomeScreen> {
                           child: CircleAvatar(
                             radius: 30,
                             backgroundColor: Colors.grey[200],
-                            child: _profileImageUrl == null
-                                ? const Icon(
+                              child: const Icon(
                                     Icons.person_add_alt_1,
                                     size: 30,
                                     color: Colors.grey,
                                   )
-                                : ClipOval(
-                                    child: Image.network(
-                                      _profileImageUrl!,
-                                      width: 60, // Lebar oval
-                                      height: 60, // Tinggi oval
-                                      fit: BoxFit
-                                          .cover, // Mengatur gambar agar pas di dalam oval
-                                    ),
-                                  ),
+                                
                           ),
                         ),
                         const SizedBox(width: 20),
@@ -105,7 +75,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   fontWeight: FontWeight.w500),
                             ),
                             Text(
-                              currentUser!.userMetadata!["display_name"] ?? '-',
+                              currentUser?.userMetadata?["display_name"] ?? '-',
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
@@ -240,12 +210,18 @@ class _HomeScreenState extends State<HomeScreen> {
                           fontWeight: FontWeight.bold,
                           color: AppColors.darkSecondary),
                     ),
-                    Text(
-                      "See All",
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                        color: AppColors.primary,
+                    GestureDetector(
+                      onTap: () => {
+                        Navigator.pushNamed(context, "/main"),
+                        ref.read(navigationProvider.notifier).updateIndex(1)
+                      },
+                      child: Text(
+                        "See All",
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: AppColors.primary,
+                        ),
                       ),
                     )
                   ],
@@ -532,7 +508,6 @@ class BestSellingCard extends StatelessWidget {
                         ),
                       ),
                     ),
-                   
                   ],
                 ),
               ),

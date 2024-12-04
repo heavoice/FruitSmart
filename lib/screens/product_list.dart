@@ -16,8 +16,8 @@ class _ProductListState extends State<ProductListScreen> {
   
   @override
   Widget build(BuildContext context) {
-    final int rowCount = MediaQuery.of(context).size.width < 400
-        ? 2
+    final int rowCount = MediaQuery.of(context).size.width <= 360
+        ? 1
         : MediaQuery.of(context).size.width < 600
             ? 2
             : MediaQuery.of(context).size.width < 900
@@ -115,7 +115,7 @@ class _ProductListState extends State<ProductListScreen> {
                               crossAxisCount: rowCount,
                               crossAxisSpacing: 20,
                               mainAxisSpacing: 20,
-                              childAspectRatio: 0.7,
+                              childAspectRatio: 0.8,
                             ),
                             shrinkWrap: true,
                             itemCount: snapshot.data!.length,

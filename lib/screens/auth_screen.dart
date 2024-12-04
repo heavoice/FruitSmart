@@ -1,5 +1,6 @@
 // ignore_for_file: deprecated_member_use
 
+import 'dart:developer';
 import 'dart:io';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/gestures.dart';
@@ -25,9 +26,13 @@ class AuthScreen extends StatefulWidget {
 }
 
 class _AuthScreenState extends State<AuthScreen> {
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
-  final _usernameController = TextEditingController();
+  final _emailController = TextEditingController(text: "");
+  final _passwordController = TextEditingController(text: "");
+  final _usernameController = TextEditingController(text: "");
+  bool _isEmailTouched = false;
+  bool _isPasswordTouched = false;
+  bool _isUsernameTouched = false;
+
   final _formKey = GlobalKey<FormState>();
   final _focusNode = FocusNode();
   bool _isLogin = true;
@@ -195,7 +200,8 @@ class _AuthScreenState extends State<AuthScreen> {
   }
 
   String? _validateEmail(String? value) {
-    if (value == null || value.isEmpty) {
+    if (!_isEmailTouched) return null;
+    if (value == null) {
       return 'Email should not be empty';
     }
     final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
@@ -206,19 +212,23 @@ class _AuthScreenState extends State<AuthScreen> {
   }
 
   String? _validatePassword(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Password should not be empty';
-    }
-    if (value.length <= 6) {
-      return 'Password should be at least 6 characters';
+    if (_isPasswordTouched) {
+      if (value == null) {
+        return 'Password should not be empty';
+      }
+      log(value.length.toString());
+      if (value.length <= 4) {
+        return 'Password should be at least 6 characters';
+      }
     }
     return null;
   }
 
   String? _validateUsername(String? value) {
+    if (!_isUsernameTouched) return null;
     final specialCharRegex = RegExp(r'[!@#<>?":_`~;[\]\\|=+)(*&^%0-9-]');
 
-    if (value == null || value.isEmpty) {
+    if (value == null) {
       return 'Username should not be empty';
     }
 
@@ -230,7 +240,7 @@ class _AuthScreenState extends State<AuthScreen> {
       return 'Username should not contain special characters';
     }
 
-    if (value.length <= 6) {
+    if (value.length <= 4) {
       return 'Username should be at least 6 characters';
     }
     return null;
@@ -249,285 +259,309 @@ class _AuthScreenState extends State<AuthScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            SizedBox(
-              width: double.infinity,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    _isLogin ? 'Sign In' : 'Register',
-                    textAlign: TextAlign.start,
-                    style: const TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.darkBackground,
-                    ),
-                  ),
-                  Text(
-                    _isLogin ? "Sign in to continue" : "Register to continue",
-                    style: const TextStyle(
-                      fontSize: 16,
-                      color: AppColors.grayText,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 20),
-            SizedBox(
-              width: double.infinity,
-              child: RawKeyboardListener(
-                focusNode: _focusNode,
-                onKey: (RawKeyEvent event) {
-                  if (event.isKeyPressed(LogicalKeyboardKey.enter) &&
-                      _isValidated) {
-                    _submit();
-                  }
-                },
-                child: Form(
-                  key: _formKey,
+      body: SingleChildScrollView(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            minHeight: MediaQuery.of(context).size.height,
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SizedBox(
+                  width: double.infinity,
                   child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      if (!_isLogin)
-                        GestureDetector(
-                          onTap: _pickAvatar,
-                          child: CircleAvatar(
-                            radius: 50,
-                            backgroundColor: Colors.grey[200],
-                            backgroundImage: _webImage != null
-                                ? MemoryImage(_webImage!)
-                                    as ImageProvider<Object>?
-                                : _imageFile != null
-                                    ? FileImage(_imageFile!)
-                                        as ImageProvider<Object>?
-                                    : null,
-                            child: _webImage == null && _imageFile == null
-                                ? const Icon(
-                                    Icons.person_add_alt_1,
-                                    size: 50,
-                                    color: Colors.grey,
-                                  )
-                                : null,
-                          ),
+                      Text(
+                        _isLogin ? 'Sign In' : 'Register',
+                        textAlign: TextAlign.start,
+                        style: const TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.darkBackground,
                         ),
-                      if (!_isLogin)
-                        Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            "Username",
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                              color: AppColors.darkSecondary,
-                            ),
-                          ),
-                          const SizedBox(height: 10),
-                          
-                          TextFormField(
-                            controller: _usernameController,
-                            cursorColor: AppColors.primary,
-                            validator: _validateUsername,
-                            decoration: InputDecoration(
-                              errorStyle: const TextStyle(
-                                fontWeight: FontWeight.w500,
-                              ),
-                              hintText: 'Input your username!',
-                              hintStyle: TextStyle(
-                                color: AppColors.grayText.withOpacity(0.5),
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
-                              ),
-                              filled: true,
-                              fillColor: Colors.grey[100],
-                              contentPadding: const EdgeInsets.symmetric(
-                                  vertical: 16, horizontal: 16),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(30),
-                                borderSide: BorderSide.none,
-                              ),
-                            ),
-                            keyboardType: TextInputType.name,
-                          ),
-                        ],
                       ),
-                      if (!_isLogin) const SizedBox(height: 10),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            "Email",
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                              color: AppColors.darkSecondary,
-                            ),
-                          ),
-                          const SizedBox(height: 10),
-                          TextFormField(
-                            controller: _emailController,
-                            cursorColor: AppColors.primary,
-                            validator: _validateEmail,
-                            decoration: InputDecoration(
-                              errorStyle: const TextStyle(
-                                fontWeight: FontWeight.w500,
-                              ),
-                              hintText: 'Input your email!',
-                              hintStyle: TextStyle(
-                                color: AppColors.grayText.withOpacity(0.5),
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
-                              ),
-                              filled: true,
-                              fillColor: Colors.grey[100],
-                              contentPadding: const EdgeInsets.symmetric(
-                                  vertical: 16, horizontal: 16),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(30),
-                                borderSide: BorderSide.none,
-                              ),
-                            ),
-                            keyboardType: TextInputType.emailAddress,
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 10),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            "Password",
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                              color: AppColors.darkSecondary,
-                            ),
-                          ),
-                          const SizedBox(height: 10),
-                          TextFormField(
-                            controller: _passwordController,
-                            cursorColor: AppColors.primary,
-                            validator: _validatePassword,
-                            decoration: InputDecoration(
-                              errorStyle: const TextStyle(
-                                fontWeight: FontWeight.w500,
-                              ),
-                              hintText: 'Input your password!',
-                              hintStyle: TextStyle(
-                                color: AppColors.grayText.withOpacity(0.5),
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
-                              ),
-                              filled: true,
-                              fillColor: Colors.grey[100],
-                              contentPadding: const EdgeInsets.symmetric(
-                                  vertical: 16, horizontal: 16),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(30),
-                                borderSide: BorderSide.none,
-                              ),
-                            ),
-                            obscureText: true,
-                          ),
-                        ],
+                      Text(
+                        _isLogin
+                            ? "Sign in to continue"
+                            : "Register to continue",
+                        style: const TextStyle(
+                          fontSize: 16,
+                          color: AppColors.grayText,
+                        ),
                       ),
                     ],
                   ),
                 ),
-              ),
-            ),
-            const SizedBox(height: 30),
-            SizedBox(
-              width: double.infinity,
-              child: AppButton(
-                onPressed: _submit,
-                isDisabled: !_isValidated,
-                isLoading: _isLoading,
-                title: _isLogin ? 'Sign In' : 'Register',
-              ),
-            ),
-            const SizedBox(height: 10),
-            const Text(
-              "Or",
-              style: TextStyle(
-                color: AppColors.grayText,
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            const SizedBox(height: 10),
-            SizedBox(
-              width: double.infinity,
-              child: TextButton(
-                style: TextButton.styleFrom(
-                  backgroundColor: AppColors.lightGrey.withOpacity(0.5),
-                  padding: const EdgeInsets.symmetric(vertical: 20),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                ),
-                onPressed: _submit,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Image.asset(
-                      AppImages.google,
-                      width: 20,
-                      height: 20,
-                    ),
-                    const SizedBox(width: 20),
-                    const Text(
-                      "Sign in with Google",
-                      style: TextStyle(
-                        color: AppColors.darkSecondary,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
+                const SizedBox(height: 20),
+                SizedBox(
+                  width: double.infinity,
+                  child: RawKeyboardListener(
+                    focusNode: _focusNode,
+                    onKey: (RawKeyEvent event) {
+                      if (event.isKeyPressed(LogicalKeyboardKey.enter) &&
+                          _isValidated) {
+                        _submit();
+                      }
+                    },
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        children: [
+                          if (!_isLogin)
+                            GestureDetector(
+                              onTap: _pickAvatar,
+                              child: CircleAvatar(
+                                radius: 50,
+                                backgroundColor: Colors.grey[200],
+                                backgroundImage: _webImage != null
+                                    ? MemoryImage(_webImage!)
+                                        as ImageProvider<Object>?
+                                    : _imageFile != null
+                                        ? FileImage(_imageFile!)
+                                            as ImageProvider<Object>?
+                                        : null,
+                                child: _webImage == null && _imageFile == null
+                                    ? const Icon(
+                                        Icons.person_add_alt_1,
+                                        size: 50,
+                                        color: Colors.grey,
+                                      )
+                                    : null,
+                              ),
+                            ),
+                          if (!_isLogin)
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  "Username",
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500,
+                                    color: AppColors.darkSecondary,
+                                  ),
+                                ),
+                                const SizedBox(height: 10),
+                                TextFormField(
+                                  controller: _usernameController,
+                                  cursorColor: AppColors.primary,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      _isUsernameTouched = true;
+                                    });
+                                  },
+                                  validator: _validateUsername,
+                                  decoration: InputDecoration(
+                                    errorStyle: const TextStyle(
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                    hintText: 'Input your username!',
+                                    hintStyle: TextStyle(
+                                      color:
+                                          AppColors.grayText.withOpacity(0.5),
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                    filled: true,
+                                    fillColor: Colors.grey[100],
+                                    contentPadding: const EdgeInsets.symmetric(
+                                        vertical: 16, horizontal: 16),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(30),
+                                      borderSide: BorderSide.none,
+                                    ),
+                                  ),
+                                  keyboardType: TextInputType.name,
+                                ),
+                              ],
+                            ),
+                          if (!_isLogin) const SizedBox(height: 10),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                "Email",
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                  color: AppColors.darkSecondary,
+                                ),
+                              ),
+                              const SizedBox(height: 10),
+                              TextFormField(
+                                controller: _emailController,
+                                onChanged: (value) {
+                                  setState(() {
+                                    _isEmailTouched = true;
+                                  });
+                                },
+                                cursorColor: AppColors.primary,
+                                validator: _validateEmail,
+                                decoration: InputDecoration(
+                                  errorStyle: const TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                  hintText: 'Input your email!',
+                                  hintStyle: TextStyle(
+                                    color: AppColors.grayText.withOpacity(0.5),
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                  filled: true,
+                                  fillColor: Colors.grey[100],
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      vertical: 16, horizontal: 16),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(30),
+                                    borderSide: BorderSide.none,
+                                  ),
+                                ),
+                                keyboardType: TextInputType.emailAddress,
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 10),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                "Password",
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                  color: AppColors.darkSecondary,
+                                ),
+                              ),
+                              const SizedBox(height: 10),
+                              TextFormField(
+                                onChanged: (value) {
+                                  setState(() {
+                                    _isPasswordTouched = true;
+                                  });
+                                },
+                                controller: _passwordController,
+                                cursorColor: AppColors.primary,
+                                validator: _validatePassword,
+                                decoration: InputDecoration(
+                                  errorStyle: const TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                  hintText: 'Input your password!',
+                                  hintStyle: TextStyle(
+                                    color: AppColors.grayText.withOpacity(0.5),
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                  filled: true,
+                                  fillColor: Colors.grey[100],
+                                  contentPadding: const EdgeInsets.symmetric(
+                                      vertical: 16, horizontal: 16),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(30),
+                                    borderSide: BorderSide.none,
+                                  ),
+                                ),
+                                obscureText: true,
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
                     ),
-                  ],
+                  ),
                 ),
-              ),
-            ),
-            const SizedBox(height: 20),
-            Center(
-              child: RichText(
-                text: TextSpan(
-                  text: _isLogin
-                      ? "Dont have an account yet? "
-                      : "Already have an account? ",
-                  style: const TextStyle(
-                      color: AppColors.darkSecondary,
-                      fontFamily: "Satoshi",
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500),
-                  children: [
-                    TextSpan(
-                      text: _isLogin ? "Register" : "Login",
+                const SizedBox(height: 30),
+                SizedBox(
+                  width: double.infinity,
+                  child: AppButton(
+                    onPressed: _submit,
+                    isDisabled: !_isValidated,
+                    isLoading: _isLoading,
+                    title: _isLogin ? 'Sign In' : 'Register',
+                  ),
+                ),
+                const SizedBox(height: 10),
+                const Text(
+                  "Or",
+                  style: TextStyle(
+                    color: AppColors.grayText,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                SizedBox(
+                  width: double.infinity,
+                  child: TextButton(
+                    style: TextButton.styleFrom(
+                      backgroundColor: AppColors.lightGrey.withOpacity(0.5),
+                      padding: const EdgeInsets.symmetric(vertical: 20),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                    ),
+                    onPressed: _submit,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Image.asset(
+                          AppImages.google,
+                          width: 20,
+                          height: 20,
+                        ),
+                        const SizedBox(width: 20),
+                        const Text(
+                          "Sign in with Google",
+                          style: TextStyle(
+                            color: AppColors.darkSecondary,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Center(
+                  child: RichText(
+                    text: TextSpan(
+                      text: _isLogin
+                          ? "Dont have an account yet? "
+                          : "Already have an account? ",
                       style: const TextStyle(
-                          color: AppColors.primary,
+                          color: AppColors.darkSecondary,
                           fontFamily: "Satoshi",
                           fontSize: 14,
                           fontWeight: FontWeight.w500),
-                      recognizer: TapGestureRecognizer()
-                        ..onTap = () {
-                          _emailController.clear();
-                          _passwordController.clear();
-                          _usernameController.clear();
-                          setState(() {
-                            _isLogin = !_isLogin;
-                          });
-                        },
-                    )
-                  ],
-                ),
-              ),
-            )
-          ],
+                      children: [
+                        TextSpan(
+                          text: _isLogin ? "Register" : "Login",
+                          style: const TextStyle(
+                              color: AppColors.primary,
+                              fontFamily: "Satoshi",
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500),
+                          recognizer: TapGestureRecognizer()
+                            ..onTap = () {
+                              _emailController.clear();
+                              _passwordController.clear();
+                              _usernameController.clear();
+                              setState(() {
+                                _isLogin = !_isLogin;
+                              });
+                            },
+                        )
+                      ],
+                    ),
+                  ),
+                )
+              ],
+            ),
+          ),
         ),
       ),
     );

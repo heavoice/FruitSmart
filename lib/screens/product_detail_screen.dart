@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:smart_shop_app/config/theme/app_colors.dart';
 import 'package:smart_shop_app/provider/cartprovider.dart';
 import 'package:smart_shop_app/provider/navprovider.dart';
-// import 'package:smart_shop_app/provider/wishlistprovider.dart' as provider;
 import 'package:hugeicons/hugeicons.dart';
 import 'package:smart_shop_app/service/products/products.dart';
 
@@ -63,257 +62,277 @@ class ProductDetailScreen extends ConsumerWidget {
           }
 
           return Scaffold(
-              appBar: AppBar(
-                automaticallyImplyLeading: false,
-                backgroundColor: Colors.transparent,
-                toolbarHeight: 80,
-                title: const CustomAppBar(),
-                surfaceTintColor: Colors.transparent,
-              ),
-              backgroundColor:
-                  Color(int.parse('0xFF${product["primary_color"]}')),
-              body: Column(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(vertical: 20),
-                    height: 250,
-                    width: double.infinity,
-                    child: Center(
-                      child: Image.network(
-                        product["image"] as String,
-                        fit: BoxFit.contain,
-                        width: 250,
-                        height: 250,
+            appBar: AppBar(
+              automaticallyImplyLeading: false,
+              backgroundColor: Colors.transparent,
+              toolbarHeight: 80,
+              title: const CustomAppBar(),
+              surfaceTintColor: Colors.transparent,
+            ),
+            backgroundColor:
+                Color(int.parse('0xFF${product["primary_color"]}')),
+            body: Stack(
+              children: [
+                Column(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(vertical: 20),
+                      height: 250,
+                      width: double.infinity,
+                      child: Center(
+                        child: Image.network(
+                          product["image"] as String,
+                          fit: BoxFit.contain,
+                          width: 250,
+                          height: 250,
+                        ),
                       ),
                     ),
-                  ),
-                  Expanded(
-                    child: Container(
-                      width: double.infinity,
-                      clipBehavior: Clip.hardEdge,
-                      decoration: const BoxDecoration(
-                        color: Colors.white,
-                      ),
-                      child: SingleChildScrollView(
-                        child: Padding(
-                          padding: const EdgeInsets.all(30),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                    Expanded(
+                      child: Container(
+                        width: double.infinity,
+                        clipBehavior: Clip.hardEdge,
+                        decoration: const BoxDecoration(
+                          color: Colors.white,
+                        ),
+                        child: SingleChildScrollView(
+                          child: Padding(
+                            padding: const EdgeInsets.all(30),
+                            child: Padding(
+                              padding: const EdgeInsets.only(bottom: 100),
+                              child: Column(
                                 children: [
-                                  Text(
-                                    product["name"] as String,
-                                    style: TextStyle(
-                                      fontSize: 22,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  Text(
-                                    '\$ ${product["price"]} / kg',
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.normal,
-                                      color: const Color.fromARGB(
-                                          255, 164, 162, 162),
-                                    ),
-                                  ),
-                                  Consumer(
-                                    builder: (context, ref, child) {
-                                      final quantity =
-                                          ref.watch(quantityProvider);
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        product["name"] as String,
+                                        style: TextStyle(
+                                          fontSize: 22,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      Text(
+                                        '\$ ${product["price"]} / kg',
+                                        style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.normal,
+                                          color: const Color.fromARGB(
+                                              255, 164, 162, 162),
+                                        ),
+                                      ),
+                                      Consumer(
+                                        builder: (context, ref, child) {
+                                          final quantity =
+                                              ref.watch(quantityProvider);
 
-                                      return Padding(
-                                        padding: const EdgeInsets.only(top: 30),
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Row(
+                                          return Padding(
+                                            padding:
+                                                const EdgeInsets.only(top: 30),
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
                                               children: [
-                                                TextButton(
-                                                  onPressed: () {
-                                                    if (quantity > 1) {
-                                                      quantityNotifier.state -=
-                                                          1;
-                                                    }
-                                                  },
-                                                  style: TextButton.styleFrom(
-                                                    fixedSize:
-                                                        const Size.square(50),
-                                                    backgroundColor:
-                                                        const Color(0xFFF5F5F5),
-                                                    shape:
-                                                        const RoundedRectangleBorder(
-                                                      borderRadius:
-                                                          BorderRadius.only(
-                                                        topLeft:
-                                                            Radius.circular(10),
-                                                        bottomLeft:
-                                                            Radius.circular(10),
-                                                        topRight:
-                                                            Radius.circular(0),
-                                                        bottomRight:
-                                                            Radius.circular(0),
+                                                Row(
+                                                  children: [
+                                                    TextButton(
+                                                      onPressed: () {
+                                                        if (quantity > 1) {
+                                                          quantityNotifier
+                                                              .state -= 1;
+                                                        }
+                                                      },
+                                                      style:
+                                                          TextButton.styleFrom(
+                                                        fixedSize:
+                                                            const Size.square(
+                                                                50),
+                                                        backgroundColor:
+                                                            const Color(
+                                                                0xFFF5F5F5),
+                                                        shape:
+                                                            const RoundedRectangleBorder(
+                                                          borderRadius:
+                                                              BorderRadius.only(
+                                                            topLeft:
+                                                                Radius.circular(
+                                                                    10),
+                                                            bottomLeft:
+                                                                Radius.circular(
+                                                                    10),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      child: const Icon(
+                                                          Icons.remove,
+                                                          color: Colors.black),
+                                                    ),
+                                                    Container(
+                                                      width: 50,
+                                                      height: 50,
+                                                      color: const Color(
+                                                          0xFFF5F5F5),
+                                                      child: Center(
+                                                        child: Text(
+                                                          '$quantity',
+                                                          style:
+                                                              const TextStyle(
+                                                            fontSize: 16,
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                          ),
+                                                        ),
                                                       ),
                                                     ),
-                                                  ),
-                                                  child: const Icon(
-                                                      Icons.remove,
-                                                      color: Colors.black),
+                                                    TextButton(
+                                                      onPressed: () {
+                                                        quantityNotifier
+                                                            .state += 1;
+                                                      },
+                                                      style:
+                                                          TextButton.styleFrom(
+                                                        fixedSize:
+                                                            const Size.square(
+                                                                50),
+                                                        backgroundColor:
+                                                            const Color(
+                                                                0xFFF5F5F5),
+                                                        shape:
+                                                            const RoundedRectangleBorder(
+                                                          borderRadius:
+                                                              BorderRadius.only(
+                                                            topRight:
+                                                                Radius.circular(
+                                                                    10),
+                                                            bottomRight:
+                                                                Radius.circular(
+                                                                    10),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      child: const Icon(
+                                                          Icons.add,
+                                                          color: Colors.black),
+                                                    ),
+                                                  ],
                                                 ),
-                                                Container(
-                                                  width: 50,
-                                                  height: 50,
-                                                  color:
-                                                      const Color(0xFFF5F5F5),
-                                                  child: Center(
-                                                    child: Text(
-                                                      '$quantity',
-                                                      style: const TextStyle(
-                                                        fontSize: 16,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                      ),
-                                                    ),
+                                                Text(
+                                                  '\$ ${(product["price"] as double) * quantity} / kg',
+                                                  style: TextStyle(
+                                                    fontSize: 24,
+                                                    fontWeight: FontWeight.bold,
                                                   ),
-                                                ),
-                                                TextButton(
-                                                  onPressed: () {
-                                                    quantityNotifier.state += 1;
-                                                  },
-                                                  style: TextButton.styleFrom(
-                                                    fixedSize:
-                                                        const Size.square(50),
-                                                    backgroundColor:
-                                                        const Color(0xFFF5F5F5),
-                                                    shape:
-                                                        const RoundedRectangleBorder(
-                                                      borderRadius:
-                                                          BorderRadius.only(
-                                                        topLeft:
-                                                            Radius.circular(0),
-                                                        bottomLeft:
-                                                            Radius.circular(0),
-                                                        topRight:
-                                                            Radius.circular(10),
-                                                        bottomRight:
-                                                            Radius.circular(10),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  child: const Icon(Icons.add,
-                                                      color: Colors.black),
                                                 ),
                                               ],
                                             ),
+                                          );
+                                        },
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.only(top: 30),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
                                             Text(
-                                              '\$ ${(product["price"] as double) * quantity} / kg',
+                                              'Description',
                                               style: TextStyle(
-                                                fontSize: 24,
+                                                fontSize: 20,
                                                 fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                            Text(
+                                              product["description"] as String,
+                                              style: TextStyle(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.normal,
                                               ),
                                             ),
                                           ],
                                         ),
-                                      );
-                                    },
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(top: 30),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          'Description',
-                                          style: TextStyle(
-                                            fontSize: 20,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                          textAlign: TextAlign.start,
-                                        ),
-                                        Text(
-                                          product["description"] as String,
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.normal,
-                                          ),
-                                          textAlign: TextAlign.start,
-                                        ),
-                                      ],
-                                    ),
+                                      ),
+                                    ],
                                   ),
                                 ],
                               ),
-                              Padding(
-                                padding: const EdgeInsets.only(top: 30),
-                                child: Row(
-                                  children: [
-                                    SizedBox(
-                                      width: 52,
-                                      height: 52,
-                                      child: TextButton(
-                                        onPressed: () {},
-                                        style: TextButton.styleFrom(
-                                          backgroundColor: Colors.white,
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(12),
-                                            side: BorderSide(
-                                              width: 2,
-                                              color: Color(int.parse(
-                                                  '0xFF${product["secondary_color"]}')),
-                                            ),
-                                          ),
-                                        ),
-                                        child: Icon(
-                                          CupertinoIcons.heart_fill,
-                                          color: Color(int.parse(
-                                              '0xFF${product["secondary_color"]}')),
-                                        ),
-                                      ),
-                                    ),
-                                    const SizedBox(width: 20),
-                                    Expanded(
-                                      child: SizedBox(
-                                        width: 52,
-                                        height: 52,
-                                        child: TextButton(
-                                          onPressed: () {},
-                                          style: TextButton.styleFrom(
-                                            backgroundColor: Color(
-                                              int.parse(
-                                                  '0xFF${product["secondary_color"]}'),
-                                            ),
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(12),
-                                            ),
-                                          ),
-                                          child: Text(
-                                            "Add to cart",
-                                            style: TextStyle(
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.white,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
+                            ),
                           ),
                         ),
                       ),
                     ),
+                  ],
+                ),
+                Positioned(
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  child: Container(
+                    color: AppColors.background,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 10),
+                      child: Row(
+                        children: [
+                          SizedBox(
+                            width: 52,
+                            height: 52,
+                            child: TextButton(
+                              onPressed: () {},
+                              style: TextButton.styleFrom(
+                                backgroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  side: BorderSide(
+                                    width: 2,
+                                    color: Color(int.parse(
+                                        '0xFF${product["secondary_color"]}')),
+                                  ),
+                                ),
+                              ),
+                              child: Icon(
+                                CupertinoIcons.heart_fill,
+                                color: Color(int.parse(
+                                    '0xFF${product["secondary_color"]}')),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 20),
+                          Expanded(
+                            child: SizedBox(
+                              height: 52,
+                              child: TextButton(
+                                onPressed: () {},
+                                style: TextButton.styleFrom(
+                                  backgroundColor: Color(
+                                    int.parse(
+                                        '0xFF${product["secondary_color"]}'),
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                ),
+                                child: Text(
+                                  "Add to cart",
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
-                ],
-              ));
+                ),
+              ],
+            ),
+          );
+
         });
   }
 }
