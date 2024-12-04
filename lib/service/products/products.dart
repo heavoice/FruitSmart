@@ -38,6 +38,17 @@ class ProductsService {
 
     return response;
   }
+
+  Future<List<Map<String, dynamic>>> getProductByCategoryId(int id) async {
+    final response = await Supabase.instance.client
+        .from("products")
+        .select(
+          "*",
+        )
+        .eq('category_id', id);
+
+    return response;
+  }
 }
 
 class ProductData {

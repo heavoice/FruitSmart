@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:smart_shop_app/config/theme/app_theme.dart';
 import 'package:smart_shop_app/screens/auth_screen.dart';
+import 'package:smart_shop_app/screens/category_screen.dart';
 import 'package:smart_shop_app/screens/main_screen.dart';
+import 'package:smart_shop_app/screens/product_category.dart';
 import 'package:smart_shop_app/screens/product_list.dart';
 import 'package:smart_shop_app/screens/profile_screen.dart';
 import 'package:smart_shop_app/screens/splash_screen.dart';
@@ -49,6 +51,8 @@ class NeedifyApp extends StatelessWidget {
           '/wishlist': (context) => const WishlistScreen(),
           "/main": (context) => const MainScreen(),
           'profile': (context) => ProfileScreen(),
+          "/category": (context) => const CategoryScreen(),
+          "/product-category": (context) => const ProductCategoryScreen(),
         },
       ),
     );

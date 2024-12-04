@@ -139,12 +139,17 @@ class HomeScreen extends ConsumerWidget {
                           fontWeight: FontWeight.bold,
                           color: AppColors.darkSecondary),
                     ),
-                    Text(
-                      "See All",
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                        color: AppColors.primary,
+                    GestureDetector(
+                      onTap: () => {
+                        Navigator.pushNamed(context, "/category"),
+                      },
+                      child: Text(
+                        "See All",
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: AppColors.primary,
+                        ),
                       ),
                     )
                   ],
@@ -153,7 +158,7 @@ class HomeScreen extends ConsumerWidget {
                   height: 20,
                 ),
                 FutureBuilder(
-                  future: categoriesService.getAllCategories(),
+                  future: categoriesService.getCategoriesWithLimit(5),
                   initialData: [],
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
