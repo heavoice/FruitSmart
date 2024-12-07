@@ -6,6 +6,7 @@ import 'package:smart_shop_app/provider/cartprovider.dart';
 import 'package:smart_shop_app/provider/navprovider.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:smart_shop_app/service/products/products.dart';
+import 'package:smart_shop_app/service/wishlist/wishlist_service.dart';
 
 class ProductDetailScreen extends ConsumerWidget {
   const ProductDetailScreen({Key? key}) : super(key: key);
@@ -264,76 +265,130 @@ class ProductDetailScreen extends ConsumerWidget {
                     ),
                   ],
                 ),
-                Positioned(
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  child: Container(
-                    color: AppColors.background,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 20, vertical: 10),
-                      child: Row(
-                        children: [
-                          SizedBox(
-                            width: 52,
-                            height: 52,
-                            child: TextButton(
-                              onPressed: () {},
-                              style: TextButton.styleFrom(
-                                backgroundColor: Colors.white,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                  side: BorderSide(
-                                    width: 2,
-                                    color: Color(int.parse(
-                                        '0xFF${product["secondary_color"]}')),
-                                  ),
-                                ),
-                              ),
-                              child: Icon(
-                                CupertinoIcons.heart_fill,
-                                color: Color(int.parse(
-                                    '0xFF${product["secondary_color"]}')),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 20),
-                          Expanded(
-                            child: SizedBox(
-                              height: 52,
-                              child: TextButton(
-                                onPressed: () {},
-                                style: TextButton.styleFrom(
-                                  backgroundColor: Color(
-                                    int.parse(
-                                        '0xFF${product["secondary_color"]}'),
-                                  ),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                ),
-                                child: Text(
-                                  "Add to cart",
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
+                PosisionedButton(
+                  product: ProductData.fromMap(product),
                 ),
               ],
             ),
           );
-
         });
+  }
+}
+
+class PosisionedButton extends StatefulWidget {
+  const PosisionedButton({Key? key, required this.product}) : super(key: key);
+  final ProductData product;
+  @override
+  _PosisionedButtonState createState() => _PosisionedButtonState();
+}
+
+class _PosisionedButtonState extends State<PosisionedButton> {
+  @override
+  Widget build(BuildContext context) {
+    final isInWishlist = WishlistService().isInWishlist(widget.product.id);
+    bool isLoading = false;
+
+    return Positioned(
+      bottom: 0,
+      left: 0,
+      right: 0,
+      child: Container(
+        color: AppColors.background,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          child: Row(
+            children: [
+              SizedBox(
+                width: 52,
+                height: 52,
+                child: FutureBuilder(
+                  future: isInWishlist,
+                  builder: (context, snapshot) {
+                    return TextButton(
+                      onPressed: () {
+                        if (snapshot.connectionState == ConnectionState.done &&
+                            isLoading == false) {
+                          setState(() {
+                            isLoading = true;
+                          });
+                          if (snapshot.data == true) {
+                            WishlistService().removeWishlist(widget.product.id);
+                          } else {
+                            WishlistService().addWishlist(widget.product.id);
+                          }
+                          setState(() {
+                            isLoading = false;
+                          });
+                        } else {
+                          setState(() {});
+                          return null;
+                        }
+                      },
+                      style: TextButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          side: BorderSide(
+                            width: 2,
+                            color: Color(int.parse(
+                                '0xFF${widget.product.secondary_color}')),
+                          ),
+                        ),
+                      ),
+                      child:
+                          snapshot.connectionState == ConnectionState.waiting ||
+                                  isLoading
+                              ? SizedBox(
+                                  width: 22,
+                                  height: 22,
+                                  child: CircularProgressIndicator(
+                                    color: Color(int.parse(
+                                        '0xFF${widget.product.secondary_color}')),
+                                    strokeWidth: 3,
+                                  ),
+                                )
+                              : Icon(
+                                  snapshot.data == true
+                                      ? CupertinoIcons.heart_fill
+                                      : CupertinoIcons.heart,
+                                  color: Color(int.parse(
+                                      '0xFF${widget.product.secondary_color}')),
+                                  size: 22,
+                                ),
+                    );
+                  },
+                ),
+              ),
+              const SizedBox(width: 20),
+              Expanded(
+                child: SizedBox(
+                  height: 52,
+                  child: TextButton(
+                    onPressed: () {},
+                    style: TextButton.styleFrom(
+                      backgroundColor: Color(
+                        int.parse('0xFF${widget.product.secondary_color}'),
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: Text(
+                      "Add to cart",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }
 
