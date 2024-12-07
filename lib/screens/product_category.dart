@@ -34,6 +34,7 @@ class _ProductCategoryState extends State<ProductCategoryScreen> {
         toolbarHeight: 80,
         title: CustomAppBar(
           title: category["category_name"],
+          route: "/main",
         ),
         surfaceTintColor: Colors.transparent,
       ),
@@ -71,8 +72,13 @@ class _ProductCategoryState extends State<ProductCategoryScreen> {
                   if (snapshot.hasData) {
                     if (snapshot.data!.length == 0) {
                       return SliverToBoxAdapter(
-                        child: Center(
-                          child: Text("No Products Found"),
+                        child: SizedBox(
+                          height: MediaQuery.of(context).size.height - 200,
+                          child: Center(
+                            child: Text(
+                              'No Product Found',
+                            ),
+                          ),
                         ),
                       );
                     }
@@ -97,8 +103,13 @@ class _ProductCategoryState extends State<ProductCategoryScreen> {
                   }
 
                   return SliverToBoxAdapter(
-                    child: Center(
-                      child: Text("No Products Found"),
+                    child: SizedBox(
+                      height: MediaQuery.of(context).size.height - 200,
+                      child: Center(
+                        child: Text(
+                          'No Product Found',
+                        ),
+                      ),
                     ),
                   );
                 }),
@@ -122,6 +133,7 @@ class _ProductItemState extends State<ProductItem> {
   @override
   Widget build(BuildContext context) {
     final isInWishlist = WishlistService().isInWishlist(widget.product.id);
+    bool isLoading = false;
 
     return GestureDetector(
       onTap: () {
@@ -195,17 +207,23 @@ class _ProductItemState extends State<ProductItem> {
                         return TextButton(
                             onPressed: () {
                               if (snapshot.connectionState ==
-                                  ConnectionState.done) {
+                                    ConnectionState.done &&
+                                isLoading == false) {
+                              setState(() {
+                                isLoading = true;
+                              });
                                 if (snapshot.data == true) {
                                   WishlistService()
-                                      .removeWishlist(widget.product.id);
-                                  setState(() {});
+                                    .removeWishlist(widget.product.id);
                                 } else {
                                   WishlistService()
-                                      .addWishlist(widget.product.id);
-                                  setState(() {});
+                                    .addWishlist(widget.product.id);
                                 }
+                              setState(() {
+                                isLoading = false;
+                              });
                               } else {
+                              setState(() {});
                                 return null;
                               }
                             },
@@ -224,22 +242,25 @@ class _ProductItemState extends State<ProductItem> {
                               ),
                             ),
                           child:
-                              snapshot.connectionState == ConnectionState.done
-                                  ? Icon(
+                              snapshot.connectionState ==
+                                      ConnectionState.waiting ||
+                                  isLoading
+                              ? SizedBox(
+                                  width: 16,
+                                  height: 16,
+                                  child: const CircularProgressIndicator(
+                                    color: AppColors.background,
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                              : Icon(
                                       snapshot.data == true
                                           ? CupertinoIcons.heart_fill
                                           : CupertinoIcons.heart,
                                       color: Colors.white,
                                       size: 16,
                                     )
-                                  : SizedBox(
-                                      width: 16,
-                                      height: 16,
-                                      child: const CircularProgressIndicator(
-                                        color: AppColors.background,
-                                        strokeWidth: 2,
-                                      ),
-                                    ),
+                                  ,
                         );
                       },
                     ),

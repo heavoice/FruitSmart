@@ -26,7 +26,9 @@ class _CategoryScreenState extends State<CategoryScreen> {
           automaticallyImplyLeading: false,
           backgroundColor: Colors.transparent,
           toolbarHeight: 80,
-          title: const CustomAppBar(),
+          title: const CustomAppBar(
+            route: "/main",
+          ),
           surfaceTintColor: Colors.transparent,
         ),
         body: CustomScrollView(
@@ -61,8 +63,13 @@ class _CategoryScreenState extends State<CategoryScreen> {
                     if (snapshot.hasData) {
                       if (snapshot.data!.length == 0) {
                         return SliverToBoxAdapter(
-                          child: Center(
-                            child: Text("No Products Found"),
+                          child: SizedBox(
+                            height: MediaQuery.of(context).size.height - 200,
+                            child: Center(
+                              child: Text(
+                                'No Category Found',
+                              ),
+                            ),
                           ),
                         );
                       }
@@ -84,12 +91,16 @@ class _CategoryScreenState extends State<CategoryScreen> {
                           childCount: snapshot.data!.length,
                         ),
                       );
-
                     }
 
                     return SliverToBoxAdapter(
-                      child: Center(
-                        child: Text("No Products Found"),
+                      child: SizedBox(
+                        height: MediaQuery.of(context).size.height - 200,
+                        child: Center(
+                          child: Text(
+                            'No Category Found',
+                          ),
+                        ),
                       ),
                     );
                   }),
@@ -161,8 +172,10 @@ class CustomAppBar extends ConsumerWidget {
   const CustomAppBar({
     super.key,
     this.title,
+    required this.route,
   });
   final title;
+  final String route;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -173,7 +186,7 @@ class CustomAppBar extends ConsumerWidget {
         children: [
           GestureDetector(
             onTap: () {
-              Navigator.pop(context);
+              Navigator.pushNamed(context, route);
             },
             child: Container(
               width: 40,

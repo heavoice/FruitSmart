@@ -108,14 +108,19 @@ class _ProductListState extends State<ProductListScreen> {
                   }
 
                   if (snapshot.hasData) {
-                    if (snapshot.data!.length == 0) {
+                    if (snapshot.data!.isEmpty) {
                       return SliverToBoxAdapter(
-                        child: Center(
-                          child: Text("No Products Found"),
+                        child: SizedBox(
+                          height: MediaQuery.of(context).size.height - 300,
+                          child: Center(
+                            child: Text(
+                              'No Product Found',
+                            ),
+                          ),
                         ),
                       );
                     }
-            
+
                     return SliverGrid(
                       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: rowCount,
@@ -134,15 +139,19 @@ class _ProductListState extends State<ProductListScreen> {
                       ),
                     );
                   }
-            
+
                   return SliverToBoxAdapter(
-                    child: Center(
-                      child: Text("No Products Found"),
+                    child: SizedBox(
+                      height: MediaQuery.of(context).size.height - 300,
+                      child: Center(
+                        child: Text(
+                          'No Product Found',
+                        ),
+                      ),
                     ),
                   );
                 }),
           ),
-              
         ],
       ),
     );
@@ -161,6 +170,7 @@ class _ProductItemState extends State<ProductItem> {
   @override
   Widget build(BuildContext context) {
     final isInWishlist = WishlistService().isInWishlist(widget.product.id);
+    bool isLoading = false;
 
     return GestureDetector(
       onTap: () {
@@ -232,52 +242,60 @@ class _ProductItemState extends State<ProductItem> {
                       future: isInWishlist,
                       builder: (context, snapshot) {
                         return TextButton(
-                            onPressed: () {
-                              if (snapshot.connectionState ==
-                                  ConnectionState.done) {
-                                if (snapshot.data == true) {
-                                  WishlistService()
+                          onPressed: () {
+                            if (snapshot.connectionState ==
+                                    ConnectionState.done &&
+                                isLoading == false) {
+                              setState(() {
+                                isLoading = true;
+                              });
+                              if (snapshot.data == true) {
+                                WishlistService()
                                     .removeWishlist(widget.product.id);
-                                } else {
-                                  WishlistService()
-                                      .addWishlist(widget.product.id);
-                              }
-                              setState(() {});
                               } else {
-                                return null;
+                                WishlistService()
+                                    .addWishlist(widget.product.id);
                               }
-                            },
-                            style: TextButton.styleFrom(
-                              padding: EdgeInsets.zero,
-                              minimumSize: const Size(45, 45),
-                              backgroundColor: Color(
-                                int.parse(
-                                    '0xFF${widget.product.secondary_color}'),
-                              ),
-                              shape: const RoundedRectangleBorder(
-                                borderRadius: BorderRadius.only(
-                                  topLeft: Radius.circular(20),
-                                  bottomRight: Radius.circular(20),
-                                ),
+                              setState(() {
+                                isLoading = false;
+                              });
+                            } else {
+                              setState(() {});
+                              return null;
+                            }
+                          },
+                          style: TextButton.styleFrom(
+                            padding: EdgeInsets.zero,
+                            minimumSize: const Size(45, 45),
+                            backgroundColor: Color(
+                              int.parse(
+                                  '0xFF${widget.product.secondary_color}'),
+                            ),
+                            shape: const RoundedRectangleBorder(
+                              borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(20),
+                                bottomRight: Radius.circular(20),
                               ),
                             ),
-                          child:
-                              snapshot.connectionState == ConnectionState.done
-                                  ? Icon(
-                                      snapshot.data == true
-                                          ? CupertinoIcons.heart_fill
-                                          : CupertinoIcons.heart,
-                                      color: Colors.white,
-                                      size: 16,
-                                    )
-                                  : SizedBox(
-                                      width: 16,
-                                      height: 16,
-                                      child: const CircularProgressIndicator(
-                                        color: AppColors.background,
-                                        strokeWidth: 2,
-                                      ),
-                                    ),
+                          ),
+                          child: snapshot.connectionState ==
+                                      ConnectionState.waiting ||
+                                  isLoading
+                              ? SizedBox(
+                                  width: 16,
+                                  height: 16,
+                                  child: const CircularProgressIndicator(
+                                    color: AppColors.background,
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                              : Icon(
+                                  snapshot.data == true
+                                      ? CupertinoIcons.heart_fill
+                                      : CupertinoIcons.heart,
+                                  color: Colors.white,
+                                  size: 16,
+                                ),
                         );
                       },
                     ),

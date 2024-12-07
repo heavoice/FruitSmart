@@ -47,9 +47,19 @@ class _WishlistScreenState extends State<WishlistScreen> {
             future: wishlist,
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return SliverToBoxAdapter(
-                  child: Center(
-                    child: CircularProgressIndicator(),
+                return SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                      return ListTile(
+                          title: Container(
+                        decoration: BoxDecoration(
+                          color: AppColors.lightGrey.withOpacity(0.3),
+                          borderRadius: BorderRadius.circular(5),
+                        ),
+                        padding: EdgeInsets.all(45),
+                      ));
+                    },
+                    childCount: 4,
                   ),
                 );
               }
@@ -63,7 +73,6 @@ class _WishlistScreenState extends State<WishlistScreen> {
                     child: Center(
                       child: Text(
                         'No Wishlist Found',
-                        style: TextStyle(fontSize: 16),
                       ),
                     ),
                   ),
@@ -140,9 +149,15 @@ class _WishlistScreenState extends State<WishlistScreen> {
                   ),
                 );
               }
-
-              return Text(
-                'No Wishlist Found',
+              return SliverToBoxAdapter(
+                child: SizedBox(
+                  height: MediaQuery.of(context).size.height - 100,
+                  child: Center(
+                    child: Text(
+                      'No Wishlist Found',
+                    ),
+                  ),
+                ),
               );
             },
           )

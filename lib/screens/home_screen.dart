@@ -473,6 +473,7 @@ class _BestSellingCardState extends State<BestSellingCard> {
   Widget build(BuildContext context) {
 
     final isInWishlist = WishlistService().isInWishlist(widget.product.id);
+    bool isLoading = false;
     
     return GestureDetector(
       onTap: () {
@@ -546,21 +547,27 @@ class _BestSellingCardState extends State<BestSellingCard> {
                       builder: (context, snapshot) {
                         return TextButton(
                             onPressed: () {
-                              if (snapshot.connectionState ==
-                                  ConnectionState.done) {
-                                if (snapshot.data == true) {
-                                  WishlistService()
-                                      .removeWishlist(widget.product.id);
-                                  setState(() {});
-                                } else {
-                                  WishlistService()
-                                      .addWishlist(widget.product.id);
-                                  setState(() {});
-                                }
+                            if (snapshot.connectionState ==
+                                    ConnectionState.done &&
+                                isLoading == false) {
+                              setState(() {
+                                isLoading = true;
+                              });
+                              if (snapshot.data == true) {
+                                WishlistService()
+                                    .removeWishlist(widget.product.id);
                               } else {
-                                return null;
+                                WishlistService()
+                                    .addWishlist(widget.product.id);
                               }
-                            },
+                              setState(() {
+                                isLoading = false;
+                              });
+                            } else {
+                              setState(() {});
+                              return null;
+                            }
+                          },
                             style: TextButton.styleFrom(
                               padding: EdgeInsets.zero,
                               minimumSize: const Size(60, 60),
@@ -575,23 +582,24 @@ class _BestSellingCardState extends State<BestSellingCard> {
                                 ),
                               ),
                             ),
-                          child:
-                              snapshot.connectionState == ConnectionState.done
-                                  ? Icon(
-                                      snapshot.data == true
-                                          ? CupertinoIcons.heart_fill
-                                          : CupertinoIcons.heart,
-                                      color: Colors.white,
-                                      size: 20,
-                                    )
-                                  : SizedBox(
-                                      width: 20,
-                                      height: 20,
-                                      child: const CircularProgressIndicator(
-                                        color: AppColors.background,
-                                        strokeWidth: 2,
-                                      ),
-                                    ),
+                          child: snapshot.connectionState ==
+                                      ConnectionState.waiting ||
+                                  isLoading
+                              ? SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: const CircularProgressIndicator(
+                                    color: AppColors.background,
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                              : Icon(
+                                  snapshot.data == true
+                                      ? CupertinoIcons.heart_fill
+                                      : CupertinoIcons.heart,
+                                  color: Colors.white,
+                                  size: 20,
+                                ),
                         );
                       },
                     ),
