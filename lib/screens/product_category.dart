@@ -223,13 +223,24 @@ class _ProductItemState extends State<ProductItem> {
                                 ),
                               ),
                             ),
-                            child: Icon(
-                              snapshot.data == true
-                                  ? CupertinoIcons.heart_fill
-                                  : CupertinoIcons.heart,
-                              color: Colors.white,
-                              size: 16,
-                            ));
+                          child:
+                              snapshot.connectionState == ConnectionState.done
+                                  ? Icon(
+                                      snapshot.data == true
+                                          ? CupertinoIcons.heart_fill
+                                          : CupertinoIcons.heart,
+                                      color: Colors.white,
+                                      size: 16,
+                                    )
+                                  : SizedBox(
+                                      width: 16,
+                                      height: 16,
+                                      child: const CircularProgressIndicator(
+                                        color: AppColors.background,
+                                        strokeWidth: 2,
+                                      ),
+                                    ),
+                        );
                       },
                     ),
                   ],

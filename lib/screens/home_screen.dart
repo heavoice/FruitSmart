@@ -575,13 +575,24 @@ class _BestSellingCardState extends State<BestSellingCard> {
                                 ),
                               ),
                             ),
-                            child: Icon(
-                              snapshot.data == true
-                                  ? CupertinoIcons.heart_fill
-                                  : CupertinoIcons.heart,
-                              color: Colors.white,
-                              size: 24,
-                            ));
+                          child:
+                              snapshot.connectionState == ConnectionState.done
+                                  ? Icon(
+                                      snapshot.data == true
+                                          ? CupertinoIcons.heart_fill
+                                          : CupertinoIcons.heart,
+                                      color: Colors.white,
+                                      size: 20,
+                                    )
+                                  : SizedBox(
+                                      width: 20,
+                                      height: 20,
+                                      child: const CircularProgressIndicator(
+                                        color: AppColors.background,
+                                        strokeWidth: 2,
+                                      ),
+                                    ),
+                        );
                       },
                     ),
                   ],

@@ -237,13 +237,12 @@ class _ProductItemState extends State<ProductItem> {
                                   ConnectionState.done) {
                                 if (snapshot.data == true) {
                                   WishlistService()
-                                      .removeWishlist(widget.product.id);
-                                  setState(() {});
+                                    .removeWishlist(widget.product.id);
                                 } else {
                                   WishlistService()
                                       .addWishlist(widget.product.id);
-                                  setState(() {});
-                                }
+                              }
+                              setState(() {});
                               } else {
                                 return null;
                               }
@@ -262,13 +261,24 @@ class _ProductItemState extends State<ProductItem> {
                                 ),
                               ),
                             ),
-                            child: Icon(
-                              snapshot.data == true
-                                  ? CupertinoIcons.heart_fill
-                                  : CupertinoIcons.heart,
-                              color: Colors.white,
-                              size: 16,
-                            ));
+                          child:
+                              snapshot.connectionState == ConnectionState.done
+                                  ? Icon(
+                                      snapshot.data == true
+                                          ? CupertinoIcons.heart_fill
+                                          : CupertinoIcons.heart,
+                                      color: Colors.white,
+                                      size: 16,
+                                    )
+                                  : SizedBox(
+                                      width: 16,
+                                      height: 16,
+                                      child: const CircularProgressIndicator(
+                                        color: AppColors.background,
+                                        strokeWidth: 2,
+                                      ),
+                                    ),
+                        );
                       },
                     ),
                   ],
