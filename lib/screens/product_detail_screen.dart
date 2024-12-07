@@ -2,9 +2,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:smart_shop_app/config/theme/app_colors.dart';
-import 'package:smart_shop_app/provider/cartprovider.dart';
 import 'package:smart_shop_app/provider/navprovider.dart';
 import 'package:hugeicons/hugeicons.dart';
+import 'package:smart_shop_app/provider/quantity_provider.dart';
 import 'package:smart_shop_app/service/products/products.dart';
 import 'package:smart_shop_app/service/wishlist/wishlist_service.dart';
 
