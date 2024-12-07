@@ -1,18 +1,13 @@
 import 'dart:io';
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:smart_shop_app/config/images/app_images.dart';
 import 'package:smart_shop_app/config/theme/app_colors.dart';
-import 'package:smart_shop_app/main.dart';
 import 'package:smart_shop_app/screens/main_screen.dart';
 import 'package:smart_shop_app/widget/app_button.dart';
 import 'package:smart_shop_app/service/auth/auth.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:smart_shop_app/service/profile/image.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
@@ -36,7 +31,6 @@ class _AuthScreenState extends State<AuthScreen> {
   bool _isValidated = false;
   bool _isLoading = false;
   String errorMessage = '';
-  Uint8List? _webImage;
   File? _imageFile;
 
   @override
@@ -48,79 +42,7 @@ class _AuthScreenState extends State<AuthScreen> {
     _usernameController.addListener(_validateForm);
   }
 
-  Future<void> _uploadImageToSupabase() async {
-    if (_webImage == null && _imageFile == null) {
-      debugPrint("Tidak ada gambar untuk diunggah");
-      return;
-    }
-
-    try {
-      // Nama file unik untuk gambar
-      final String fileName =
-          'avatar_${DateTime.now().millisecondsSinceEpoch}.png';
-      final String bucketPath = 'profiles/$fileName';
-
-      if (_webImage != null) {
-        // Jika berjalan di Web, gunakan _webImage (Uint8List)
-        await supabase.storage.from('profiles').uploadBinary(
-              bucketPath,
-              _webImage!,
-              fileOptions:
-                  const FileOptions(cacheControl: '3600', upsert: true),
-            );
-      } else if (_imageFile != null) {
-        // Jika berjalan di Mobile/Desktop, gunakan _imageFile (File)
-        await supabase.storage.from('profiles').upload(
-              bucketPath,
-              _imageFile!,
-              fileOptions:
-                  const FileOptions(cacheControl: '3600', upsert: true),
-            );
-      }
-
-      // Dapatkan URL publik dari gambar yang diunggah
-      final String publicUrl =
-          supabase.storage.from('profiles').getPublicUrl(bucketPath);
-
-      // Simpan URL gambar di shared_preferences
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString('profile_image_url', publicUrl);
-
-      debugPrint('Gambar berhasil diunggah ke Supabase: $publicUrl');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Gambar berhasil diunggah: $publicUrl')),
-      );
-    } catch (e) {
-      debugPrint('Gagal mengunggah gambar: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Gagal mengunggah gambar')),
-      );
-    }
-  }
-
-  Future<void> _pickAvatar() async {
-    final ImagePicker picker = ImagePicker();
-    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
-
-    if (image != null) {
-      if (kIsWeb) {
-        // Web: Baca gambar sebagai byte
-        final Uint8List imageBytes = await image.readAsBytes();
-        setState(() {
-          _webImage = imageBytes;
-        });
-      } else {
-        // Mobile/Desktop: Gunakan objek File
-        setState(() {
-          _imageFile = File(image.path);
-        });
-      }
-
-      // Setelah gambar dipilih, unggah ke Supabase
-      await _uploadImageToSupabase();
-    }
-  }
-
+ 
   Future<void> _submit() async {
     try {
       setState(() {
@@ -294,92 +216,17 @@ class _AuthScreenState extends State<AuthScreen> {
                 const SizedBox(height: 20),
                 SizedBox(
                   width: double.infinity,
-                  child: RawKeyboardListener(
-                    focusNode: _focusNode,
-                    onKey: (RawKeyEvent event) {
-                      if (event.isKeyPressed(LogicalKeyboardKey.enter) &&
-                          _isValidated) {
-                        _submit();
-                      }
-                    },
-                    child: Form(
-                      key: _formKey,
-                      child: Column(
-                        children: [
-                          if (!_isLogin)
-                            GestureDetector(
-                              onTap: _pickAvatar,
-                              child: CircleAvatar(
-                                radius: 50,
-                                backgroundColor: Colors.grey[200],
-                                backgroundImage: _webImage != null
-                                    ? MemoryImage(_webImage!)
-                                        as ImageProvider<Object>?
-                                    : _imageFile != null
-                                        ? FileImage(_imageFile!)
-                                            as ImageProvider<Object>?
-                                        : null,
-                                child: _webImage == null && _imageFile == null
-                                    ? const Icon(
-                                        Icons.person_add_alt_1,
-                                        size: 50,
-                                        color: Colors.grey,
-                                      )
-                                    : null,
-                              ),
-                            ),
-                          if (!_isLogin)
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text(
-                                  "Username",
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w500,
-                                    color: AppColors.darkSecondary,
-                                  ),
-                                ),
-                                const SizedBox(height: 10),
-                                TextFormField(
-                                  controller: _usernameController,
-                                  cursorColor: AppColors.primary,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      _isUsernameTouched = true;
-                                    });
-                                  },
-                                  validator: _validateUsername,
-                                  decoration: InputDecoration(
-                                    errorStyle: const TextStyle(
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                    hintText: 'Input your username!',
-                                    hintStyle: TextStyle(
-                                      color:
-                                          AppColors.grayText.withOpacity(0.5),
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                    filled: true,
-                                    fillColor: Colors.grey[100],
-                                    contentPadding: const EdgeInsets.symmetric(
-                                        vertical: 16, horizontal: 16),
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(30),
-                                      borderSide: BorderSide.none,
-                                    ),
-                                  ),
-                                  keyboardType: TextInputType.name,
-                                ),
-                              ],
-                            ),
-                          if (!_isLogin) const SizedBox(height: 10),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      children: [
+                         
+                        if (!_isLogin)
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               const Text(
-                                "Email",
+                                "Username",
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w500,
@@ -388,19 +235,19 @@ class _AuthScreenState extends State<AuthScreen> {
                               ),
                               const SizedBox(height: 10),
                               TextFormField(
-                                controller: _emailController,
+                                controller: _usernameController,
+                                cursorColor: AppColors.primary,
                                 onChanged: (value) {
                                   setState(() {
-                                    _isEmailTouched = true;
+                                    _isUsernameTouched = true;
                                   });
                                 },
-                                cursorColor: AppColors.primary,
-                                validator: _validateEmail,
+                                validator: _validateUsername,
                                 decoration: InputDecoration(
                                   errorStyle: const TextStyle(
                                     fontWeight: FontWeight.w500,
                                   ),
-                                  hintText: 'Input your email!',
+                                  hintText: 'Input your username!',
                                   hintStyle: TextStyle(
                                     color: AppColors.grayText.withOpacity(0.5),
                                     fontSize: 16,
@@ -415,57 +262,101 @@ class _AuthScreenState extends State<AuthScreen> {
                                     borderSide: BorderSide.none,
                                   ),
                                 ),
-                                keyboardType: TextInputType.emailAddress,
+                                keyboardType: TextInputType.name,
                               ),
                             ],
                           ),
-                          const SizedBox(height: 10),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text(
-                                "Password",
-                                style: TextStyle(
+                        if (!_isLogin) const SizedBox(height: 10),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              "Email",
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                                color: AppColors.darkSecondary,
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            TextFormField(
+                              controller: _emailController,
+                              onChanged: (value) {
+                                setState(() {
+                                  _isEmailTouched = true;
+                                });
+                              },
+                              cursorColor: AppColors.primary,
+                              validator: _validateEmail,
+                              decoration: InputDecoration(
+                                errorStyle: const TextStyle(
+                                  fontWeight: FontWeight.w500,
+                                ),
+                                hintText: 'Input your email!',
+                                hintStyle: TextStyle(
+                                  color: AppColors.grayText.withOpacity(0.5),
                                   fontSize: 16,
                                   fontWeight: FontWeight.w500,
-                                  color: AppColors.darkSecondary,
+                                ),
+                                filled: true,
+                                fillColor: Colors.grey[100],
+                                contentPadding: const EdgeInsets.symmetric(
+                                    vertical: 16, horizontal: 16),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(30),
+                                  borderSide: BorderSide.none,
                                 ),
                               ),
-                              const SizedBox(height: 10),
-                              TextFormField(
-                                onChanged: (value) {
-                                  setState(() {
-                                    _isPasswordTouched = true;
-                                  });
-                                },
-                                controller: _passwordController,
-                                cursorColor: AppColors.primary,
-                                validator: _validatePassword,
-                                decoration: InputDecoration(
-                                  errorStyle: const TextStyle(
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                  hintText: 'Input your password!',
-                                  hintStyle: TextStyle(
-                                    color: AppColors.grayText.withOpacity(0.5),
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                  filled: true,
-                                  fillColor: Colors.grey[100],
-                                  contentPadding: const EdgeInsets.symmetric(
-                                      vertical: 16, horizontal: 16),
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(30),
-                                    borderSide: BorderSide.none,
-                                  ),
-                                ),
-                                obscureText: true,
+                              keyboardType: TextInputType.emailAddress,
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 10),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              "Password",
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                                color: AppColors.darkSecondary,
                               ),
-                            ],
-                          ),
-                        ],
-                      ),
+                            ),
+                            const SizedBox(height: 10),
+                            TextFormField(
+                              onChanged: (value) {
+                                setState(() {
+                                  _isPasswordTouched = true;
+                                });
+                              },
+                              controller: _passwordController,
+                              cursorColor: AppColors.primary,
+                              validator: _validatePassword,
+                              decoration: InputDecoration(
+                                errorStyle: const TextStyle(
+                                  fontWeight: FontWeight.w500,
+                                ),
+                                hintText: 'Input your password!',
+                                hintStyle: TextStyle(
+                                  color: AppColors.grayText.withOpacity(0.5),
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                                filled: true,
+                                fillColor: Colors.grey[100],
+                                contentPadding: const EdgeInsets.symmetric(
+                                    vertical: 16, horizontal: 16),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(30),
+                                  borderSide: BorderSide.none,
+                                ),
+                              ),
+                              obscureText: true,
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
                   ),
                 ),

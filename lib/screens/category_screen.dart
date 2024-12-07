@@ -31,24 +31,21 @@ class _CategoryScreenState extends State<CategoryScreen> {
         ),
         body: CustomScrollView(
           slivers: [
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.all(15),
-                child: FutureBuilder(
-                    future: CategoriesService().getAllCategories(),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return GridView.builder(
-                          gridDelegate:
-                              SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: rowCount,
-                            crossAxisSpacing: 20,
-                            mainAxisSpacing: 20,
-                            childAspectRatio: 0.8,
-                          ),
-                          shrinkWrap: true,
-                          itemCount: 4,
-                          itemBuilder: (context, index) {
+            SliverPadding(
+              padding: const EdgeInsets.all(15),
+              sliver: FutureBuilder(
+                  future: CategoriesService().getAllCategories(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return SliverGrid(
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: rowCount,
+                          crossAxisSpacing: 20,
+                          mainAxisSpacing: 20,
+                          childAspectRatio: 0.8,
+                        ),
+                        delegate: SliverChildBuilderDelegate(
+                          (context, index) {
                             return Container(
                               decoration: BoxDecoration(
                                 color: AppColors.lightGrey.withOpacity(0.3),
@@ -56,36 +53,46 @@ class _CategoryScreenState extends State<CategoryScreen> {
                               ),
                             );
                           },
+                          childCount: 4,
+                        ),
+                      );
+                    }
+
+                    if (snapshot.hasData) {
+                      if (snapshot.data!.length == 0) {
+                        return SliverToBoxAdapter(
+                          child: Center(
+                            child: Text("No Products Found"),
+                          ),
                         );
                       }
 
-                      if (snapshot.hasData) {
-                        if (snapshot.data!.length == 0) {
-                          return Center(child: Text("No Category Found"));
-                        }
-
-                        return GridView.builder(
-                          gridDelegate:
-                              SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: rowCount,
-                            crossAxisSpacing: 20,
-                            mainAxisSpacing: 20,
-                            childAspectRatio: 0.8,
-                          ),
-                          shrinkWrap: true,
-                          itemCount: snapshot.data!.length,
-                          itemBuilder: (context, index) {
+                      return SliverGrid(
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: rowCount,
+                          crossAxisSpacing: 20,
+                          mainAxisSpacing: 20,
+                          childAspectRatio: 0.8,
+                        ),
+                        delegate: SliverChildBuilderDelegate(
+                          (context, index) {
                             final category = snapshot.data![index];
                             return CategoryItem(
                               category: Category.fromMap(category),
                             );
                           },
-                        );
-                      }
+                          childCount: snapshot.data!.length,
+                        ),
+                      );
 
-                      return Center(child: Text("No Category Found"));
-                    }),
-              ),
+                    }
+
+                    return SliverToBoxAdapter(
+                      child: Center(
+                        child: Text("No Products Found"),
+                      ),
+                    );
+                  }),
             )
           ],
         ));

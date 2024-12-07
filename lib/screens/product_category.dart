@@ -40,68 +40,70 @@ class _ProductCategoryState extends State<ProductCategoryScreen> {
       backgroundColor: AppColors.background,
       body: CustomScrollView(
         slivers: [
-          SliverToBoxAdapter(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(15),
-                  child: FutureBuilder<List<Map<String, dynamic>>>(
-                      future: productsService
-                          .getProductByCategoryId(category["category_id"]),
-                      builder: (contex, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return GridView.builder(
-                            gridDelegate:
-                                SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: rowCount,
-                              crossAxisSpacing: 20,
-                              mainAxisSpacing: 20,
-                              childAspectRatio: 0.7,
-                            ),
-                            shrinkWrap: true,
-                            itemCount: 5,
-                            itemBuilder: (context, index) {
-                              return Container(
-                                  decoration: BoxDecoration(
-                                color: AppColors.lightGrey.withOpacity(0.4),
-                                borderRadius: BorderRadius.circular(20),
-                              ));
-                            },
+          SliverPadding(
+            padding: const EdgeInsets.all(15),
+            sliver: FutureBuilder<List<Map<String, dynamic>>>(
+                future: productsService
+                    .getProductByCategoryId(category["category_id"]),
+                builder: (contex, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return SliverGrid(
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: rowCount,
+                        crossAxisSpacing: 20,
+                        mainAxisSpacing: 20,
+                        childAspectRatio: 0.7,
+                      ),
+                      
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) {
+                          return Container(
+                              decoration: BoxDecoration(
+                            color: AppColors.lightGrey.withOpacity(0.4),
+                            borderRadius: BorderRadius.circular(20),
+                          ));
+                        },
+                        childCount: 4,
+                      ),
+                    );
+                  }
+
+                  if (snapshot.hasData) {
+                    if (snapshot.data!.length == 0) {
+                      return SliverToBoxAdapter(
+                        child: Center(
+                          child: Text("No Products Found"),
+                        ),
+                      );
+                    }
+
+                    return SliverGrid(
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: rowCount,
+                        crossAxisSpacing: 20,
+                        mainAxisSpacing: 20,
+                        childAspectRatio: 0.7,
+                      ),
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) {
+                          final product = snapshot.data![index];
+                          return ProductItem(
+                            product: ProductData.fromMap(product),
                           );
-                        }
+                        },
+                        childCount: snapshot.data!.length,
+                      ),
+                    );
+                  }
 
-                        if (snapshot.hasData) {
-                          if (snapshot.data!.length == 0) {
-                            return Center(child: Text("No Products Found"));
-                          }
-
-                          return GridView.builder(
-                            gridDelegate:
-                                SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: rowCount,
-                              crossAxisSpacing: 20,
-                              mainAxisSpacing: 20,
-                              childAspectRatio: 0.7,
-                            ),
-                            shrinkWrap: true,
-                            itemCount: snapshot.data!.length,
-                            itemBuilder: (context, index) {
-                              final product = snapshot.data![index];
-                              return ProductItem(
-                                product: ProductData.fromMap(product),
-                              );
-                            },
-                          );
-                        }
-
-                        return Center(child: Text("No Products Found"));
-                      }),
-                ),
-              ],
-            ),
+                  return SliverToBoxAdapter(
+                    child: Center(
+                      child: Text("No Products Found"),
+                    ),
+                  );
+                }),
           ),
+              
         ],
       ),
     );
