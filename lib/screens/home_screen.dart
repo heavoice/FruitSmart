@@ -6,6 +6,7 @@ import 'package:hugeicons/hugeicons.dart';
 import 'package:smart_shop_app/config/theme/app_colors.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:smart_shop_app/provider/navprovider.dart';
+import 'package:smart_shop_app/provider/quantity_provider.dart';
 import 'package:smart_shop_app/screens/auth_screen.dart';
 import 'package:smart_shop_app/service/auth/auth.dart';
 import 'package:smart_shop_app/service/categories/categories.dart';
@@ -385,24 +386,29 @@ class CategorySkeleton extends StatelessWidget {
   }
 }
 
-class BestSellingCard extends StatefulWidget {
+class BestSellingCard extends ConsumerStatefulWidget {
   final ProductData product;
   const BestSellingCard({super.key, required this.product});
 
   @override
-  State<BestSellingCard> createState() => _BestSellingCardState();
+  ConsumerState<BestSellingCard> createState() => _BestSellingCardState();
 }
 
-class _BestSellingCardState extends State<BestSellingCard> {
+class _BestSellingCardState extends ConsumerState<BestSellingCard> {
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(
+    BuildContext context,
+  ) {
 
     final isInWishlist = WishlistService().isInWishlist(widget.product.id);
     bool isLoading = false;
+    final quantityNotifier = ref.read(quantityProvider.notifier);
+
     
     return GestureDetector(
       onTap: () {
+        quantityNotifier.state = 1;
         Navigator.pushNamed(
           context,
           '/detail',

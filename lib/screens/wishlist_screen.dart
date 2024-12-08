@@ -110,15 +110,17 @@ class _WishlistScreenState extends State<WishlistScreen> {
                                     Text(
                                       data[index]['product_id']['name'],
                                       style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w600,
+                                        color: AppColors.darkBackground,
                                       ),
                                     ),
                                     Text(
                                       '\$ ${data[index]['product_id']['price']}',
                                       style: TextStyle(
                                         fontSize: 14,
-                                        color: Colors.grey,
+                                          color: AppColors.grayText,
+                                          fontWeight: FontWeight.w500
                                       ),
                                     ),
                                   ],
