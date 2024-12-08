@@ -305,23 +305,36 @@ class _PosisionedButtonState extends State<PosisionedButton> {
                   future: isInWishlist,
                   builder: (context, snapshot) {
                     return TextButton(
-                      onPressed: () {
-                        if (snapshot.connectionState == ConnectionState.done &&
-                            isLoading == false) {
-                          setState(() {
-                            isLoading = true;
-                          });
-                          if (snapshot.data == true) {
-                            WishlistService().removeWishlist(widget.product.id);
+                      onPressed: () async {
+                        try {
+                          if (snapshot.connectionState ==
+                                  ConnectionState.done &&
+                              isLoading == false) {
+                            setState(() {
+                              isLoading = true;
+                            });
+                            if (snapshot.data == true) {
+                              await WishlistService()
+                                  .removeWishlist(widget.product.id);
+                            } else {
+                              await WishlistService()
+                                  .addWishlist(widget.product.id);
+                            }
                           } else {
-                            WishlistService().addWishlist(widget.product.id);
+                            setState(() {});
+                            return null;
                           }
+                        } catch (e) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Something went wrong: $e'),
+                              backgroundColor: Colors.red[600],
+                            ),
+                          );
+                        } finally {
                           setState(() {
                             isLoading = false;
                           });
-                        } else {
-                          setState(() {});
-                          return null;
                         }
                       },
                       style: TextButton.styleFrom(

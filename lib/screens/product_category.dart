@@ -205,28 +205,38 @@ class _ProductItemState extends State<ProductItem> {
                       future: isInWishlist,
                       builder: (context, snapshot) {
                         return TextButton(
-                            onPressed: () {
+                          onPressed: () async {
+                            try {
                               if (snapshot.connectionState ==
-                                    ConnectionState.done &&
-                                isLoading == false) {
-                              setState(() {
-                                isLoading = true;
-                              });
+                                      ConnectionState.done &&
+                                  isLoading == false) {
+                                setState(() {
+                                  isLoading = true;
+                                });
                                 if (snapshot.data == true) {
-                                  WishlistService()
-                                    .removeWishlist(widget.product.id);
+                                  await WishlistService()
+                                      .removeWishlist(widget.product.id);
                                 } else {
-                                  WishlistService()
-                                    .addWishlist(widget.product.id);
+                                  await WishlistService()
+                                      .addWishlist(widget.product.id);
                                 }
+                              } else {
+                                setState(() {});
+                                return null;
+                              }
+                            } catch (e) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('Something went wrong: $e'),
+                                  backgroundColor: Colors.red[600],
+                                ),
+                              );
+                            } finally {
                               setState(() {
                                 isLoading = false;
                               });
-                              } else {
-                              setState(() {});
-                                return null;
-                              }
-                            },
+                            }
+                          },
                             style: TextButton.styleFrom(
                               padding: EdgeInsets.zero,
                               minimumSize: const Size(45, 45),

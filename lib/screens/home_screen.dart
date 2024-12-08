@@ -11,6 +11,7 @@ import 'package:smart_shop_app/service/auth/auth.dart';
 import 'package:smart_shop_app/service/categories/categories.dart';
 import 'package:smart_shop_app/service/products/products.dart';
 import 'package:smart_shop_app/service/wishlist/wishlist_service.dart';
+import 'package:smart_shop_app/widget/app_dialog.dart';
 
 
 class HomeScreen extends ConsumerWidget {
@@ -89,89 +90,14 @@ class HomeScreen extends ConsumerWidget {
                       onPressed: () => showDialog(
                         context: context,
                         builder: (BuildContext context) {
-                          return AlertDialog(
-                            backgroundColor: AppColors.background,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15),
-                            ),
-                            title: const Text(
-                              'Log Out',
-                              style: TextStyle(
-                                color: AppColors.darkSecondary,
-                                fontSize: 20,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            content: const Text(
-                              'Are you sure you want to log out?',
-                              style: TextStyle(
-                                color: AppColors.grayText,
-                                fontSize: 16,
-                              ),
-                            ),
-                            actions: <Widget>[
-                              Container(
-                                child: Row(
-                                  children: [
-                                    Expanded(
-                                      child: SizedBox(
-                                        height: 35,
-                                        child: TextButton(
-                                          style: TextButton.styleFrom(
-                                            foregroundColor:
-                                                AppColors.background,
-                                            backgroundColor: AppColors.primary,
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(10),
-                                            ),
-                                          ),
-                                          onPressed: () => {
-                                            Navigator.of(context).pop(),
-                                          },
-                                          child: const Text(
-                                            'Cancel',
-                                            style: TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 14,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    SizedBox(
-                                      width: 10,
-                                    ),
-                                    Expanded(
-                                      child: SizedBox(
-                                        height: 35,
-                                        child: TextButton(
-                                          style: TextButton.styleFrom(
-                                            foregroundColor:
-                                                Colors.red.shade100,
-                                            backgroundColor: Colors.red,
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(10),
-                                            ),
-                                          ),
-                                          onPressed: () => {
-                                            _logOut(context),
-                                          },
-                                          child: const Text(
-                                            'Log Out',
-                                            style: TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 14,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              )
-                            ],
+                          return AppDialog(
+                            title: "Log Out from Needify!",
+                            message: "Are you sure want to log out?",
+                            onConfirm: () {
+                              _logOut(context);
+                            },
+                            cancelText: "Cancel",
+                            confirmText: "Log Out",
                           );
                         },
                       ),
@@ -546,26 +472,37 @@ class _BestSellingCardState extends State<BestSellingCard> {
                       future: isInWishlist,
                       builder: (context, snapshot) {
                         return TextButton(
-                            onPressed: () {
-                            if (snapshot.connectionState ==
-                                    ConnectionState.done &&
-                                isLoading == false) {
-                              setState(() {
-                                isLoading = true;
-                              });
-                              if (snapshot.data == true) {
-                                WishlistService()
-                                    .removeWishlist(widget.product.id);
+                          onPressed: () async {
+                            try {
+                              if (snapshot.connectionState ==
+                                      ConnectionState.done &&
+                                  isLoading == false) {
+                                setState(() {
+                                  isLoading = true;
+                                });
+                                if (snapshot.data == true) {
+                                  await WishlistService()
+                                      .removeWishlist(widget.product.id);
+                                } else {
+                                  await WishlistService()
+                                      .addWishlist(widget.product.id);
+                                }
+                                
                               } else {
-                                WishlistService()
-                                    .addWishlist(widget.product.id);
+                                setState(() {});
+                                return null;
                               }
+                            } catch (e) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('Something went wrong: $e'),
+                                  backgroundColor: Colors.red[600],
+                                ),
+                              );
+                            } finally {
                               setState(() {
                                 isLoading = false;
                               });
-                            } else {
-                              setState(() {});
-                              return null;
                             }
                           },
                             style: TextButton.styleFrom(
