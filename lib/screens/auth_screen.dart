@@ -1,13 +1,12 @@
-import 'dart:io';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:smart_shop_app/config/images/app_images.dart';
 import 'package:smart_shop_app/config/theme/app_colors.dart';
 import 'package:smart_shop_app/screens/main_screen.dart';
+import 'package:smart_shop_app/service/user/user.dart';
 import 'package:smart_shop_app/widget/app_button.dart';
 import 'package:smart_shop_app/service/auth/auth.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:smart_shop_app/service/profile/image.dart';
 
 class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
@@ -24,14 +23,13 @@ class _AuthScreenState extends State<AuthScreen> {
   bool _isEmailTouched = false;
   bool _isPasswordTouched = false;
   bool _isUsernameTouched = false;
-
+  String? _profileImageUrl;
   final _formKey = GlobalKey<FormState>();
   final _focusNode = FocusNode();
   bool _isLogin = true;
   bool _isValidated = false;
   bool _isLoading = false;
   String errorMessage = '';
-  File? _imageFile;
 
   @override
   void initState() {
@@ -42,7 +40,6 @@ class _AuthScreenState extends State<AuthScreen> {
     _usernameController.addListener(_validateForm);
   }
 
- 
   Future<void> _submit() async {
     try {
       setState(() {
@@ -57,32 +54,24 @@ class _AuthScreenState extends State<AuthScreen> {
       } else {
         // Jika registrasi
         final email = _emailController.text;
+        final password = _passwordController.text;
+        final username = _usernameController.text;
 
-        // Gunakan email sebagai userId
-        final userId = email;
+        // Lakukan registrasi
+        await AuthService().signUpWithEmail(email, password, username);
 
-        // Setelah pendaftaran, lakukan login dan dapatkan userId dari email
-        await AuthService().signUpWithEmail(
-          email,
-          _passwordController.text,
-          _usernameController.text,
-        );
-
-        // Upload avatar jika ada
-        if (_imageFile != null) {
-          final imageService = ImageService();
-          // Upload the image to Supabase storage
-          final imageUrl =
-              await imageService.uploadImage(File(_imageFile!.path), userId);
-
-          if (imageUrl != null) {
-            // Update the profile image URL if image upload is successful
-            await imageService.updateProfileImage(userId, imageUrl);
-          }
+        // Setelah berhasil registrasi, ambil userId dan buat profil
+        final user = Supabase.instance.client.auth.currentUser;
+        if (user != null) {
+          await UserService().createUserProfile(
+            user.id,
+            username,
+            '',
+          );
         }
       }
 
-      // Setelah berhasil login atau register, pindah ke halaman utama
+      // Setelah berhasil login atau registrasi, pindah ke halaman utama
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
           builder: (context) => const MainScreen(),
@@ -97,7 +86,7 @@ class _AuthScreenState extends State<AuthScreen> {
         ),
       );
     } catch (e) {
-      // Handle any general errors (e.g., image upload errors)
+      // Handle any general errors
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Something went wrong: $e'),
@@ -220,11 +209,28 @@ class _AuthScreenState extends State<AuthScreen> {
                     key: _formKey,
                     child: Column(
                       children: [
-                         
                         if (!_isLogin)
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
+                              GestureDetector(
+                                onTap: null,
+                                child: CircleAvatar(
+                                  radius: 50,
+                                  backgroundColor: Colors.grey[300],
+                                  child: _profileImageUrl == null
+                                      ? Icon(
+                                          Icons.add_a_photo,
+                                          color: Colors.white,
+                                          size: 30,
+                                        )
+                                      : null,
+                                  backgroundImage: _profileImageUrl == null
+                                      ? null
+                                      : NetworkImage(_profileImageUrl!)
+                                          as ImageProvider,
+                                ),
+                              ),
                               const Text(
                                 "Username",
                                 style: TextStyle(

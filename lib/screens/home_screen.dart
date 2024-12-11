@@ -6,12 +6,12 @@ import 'package:hugeicons/hugeicons.dart';
 import 'package:smart_shop_app/config/theme/app_colors.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:smart_shop_app/provider/navprovider.dart';
+import 'package:smart_shop_app/provider/profileimgprovider.dart';
 import 'package:smart_shop_app/screens/auth_screen.dart';
 import 'package:smart_shop_app/service/auth/auth.dart';
 import 'package:smart_shop_app/service/categories/categories.dart';
 import 'package:smart_shop_app/service/products/products.dart';
 import 'package:smart_shop_app/service/wishlist/wishlist_service.dart';
-
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -21,8 +21,8 @@ class HomeScreen extends ConsumerWidget {
     final currentUser = AuthService().getCurrentUser();
     final categoriesService = CategoriesService();
     final productsService = ProductsService();
+    final profileImageAsyncValue = ref.watch(userProfileImageProvider);
 
- 
     Future<void> _logOut(BuildContext context) async {
       try {
         await AuthService().logOut();
@@ -55,12 +55,32 @@ class HomeScreen extends ConsumerWidget {
                           child: CircleAvatar(
                             radius: 30,
                             backgroundColor: Colors.grey[200],
-                              child: const Icon(
-                                    Icons.person_add_alt_1,
-                                    size: 30,
-                                    color: Colors.grey,
-                                  )
-                                
+                            child: profileImageAsyncValue.when(
+                              loading: () =>
+                                  const CircularProgressIndicator(), // Show a loading spinner
+                              error: (error, stackTrace) => const Icon(
+                                // Show an error icon if the image fetch fails
+                                Icons.error,
+                                size: 30,
+                                color: Colors.grey,
+                              ),
+                              data: (profileImageUrl) {
+                                // Show the profile image if available, otherwise fallback to default icon
+                                return profileImageUrl != null &&
+                                        profileImageUrl.isNotEmpty
+                                    ? CircleAvatar(
+                                        radius: 30,
+                                        backgroundImage:
+                                            NetworkImage(profileImageUrl),
+                                      )
+                                    : const Icon(
+                                        // Fallback to default icon if no image URL is found
+                                        Icons.person_add_alt_1,
+                                        size: 30,
+                                        color: Colors.grey,
+                                      );
+                              },
+                            ),
                           ),
                         ),
                         const SizedBox(width: 20),
@@ -468,13 +488,11 @@ class BestSellingCard extends StatefulWidget {
 }
 
 class _BestSellingCardState extends State<BestSellingCard> {
-
   @override
   Widget build(BuildContext context) {
-
     final isInWishlist = WishlistService().isInWishlist(widget.product.id);
     bool isLoading = false;
-    
+
     return GestureDetector(
       onTap: () {
         Navigator.pushNamed(
@@ -546,7 +564,7 @@ class _BestSellingCardState extends State<BestSellingCard> {
                       future: isInWishlist,
                       builder: (context, snapshot) {
                         return TextButton(
-                            onPressed: () {
+                          onPressed: () {
                             if (snapshot.connectionState ==
                                     ConnectionState.done &&
                                 isLoading == false) {
@@ -568,20 +586,20 @@ class _BestSellingCardState extends State<BestSellingCard> {
                               return null;
                             }
                           },
-                            style: TextButton.styleFrom(
-                              padding: EdgeInsets.zero,
-                              minimumSize: const Size(60, 60),
-                              backgroundColor: Color(
-                                int.parse(
-                                    '0xFF${widget.product.secondary_color}'),
-                              ),
-                              shape: const RoundedRectangleBorder(
-                                borderRadius: BorderRadius.only(
-                                  topLeft: Radius.circular(25),
-                                  bottomRight: Radius.circular(25),
-                                ),
+                          style: TextButton.styleFrom(
+                            padding: EdgeInsets.zero,
+                            minimumSize: const Size(60, 60),
+                            backgroundColor: Color(
+                              int.parse(
+                                  '0xFF${widget.product.secondary_color}'),
+                            ),
+                            shape: const RoundedRectangleBorder(
+                              borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(25),
+                                bottomRight: Radius.circular(25),
                               ),
                             ),
+                          ),
                           child: snapshot.connectionState ==
                                       ConnectionState.waiting ||
                                   isLoading
