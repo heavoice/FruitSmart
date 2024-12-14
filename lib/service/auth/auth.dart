@@ -30,6 +30,7 @@ class AuthService {
 
     await db.auth.signUp(password: password, email: email, data: {
       "display_name": username,
+      "email": email,
     });
   }
 
