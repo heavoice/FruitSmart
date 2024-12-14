@@ -131,6 +131,21 @@ class CartService {
     await supabase.from('cart').delete().eq('id', id);
   }
 
+  clearCart() async {
+    try {
+      final currentUser = await supabase.auth.currentUser;
+
+      if (currentUser == null) {
+        return null;
+      }
+
+      await supabase.from('cart').delete().eq('user_id', currentUser.id);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
   Stream? getCartItems() {
     // Get all cart items
     final currentUser = supabase.auth.currentUser;

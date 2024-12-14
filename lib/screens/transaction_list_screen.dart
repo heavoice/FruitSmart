@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:hugeicons/hugeicons.dart';
 import 'package:smart_shop_app/config/theme/app_colors.dart';
-import 'package:smart_shop_app/constant/transaction_list.dart';
+import 'package:smart_shop_app/main.dart';
+import 'package:smart_shop_app/service/transaction/transaction_service.dart';
+import 'package:intl/intl.dart';
+import 'package:smart_shop_app/widget/app_dialog.dart';
 
 class TransactionListScreen extends StatefulWidget {
   const TransactionListScreen({super.key});
@@ -33,211 +35,290 @@ class _TransactionList extends State<TransactionListScreen> {
                     ),
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: GridView.builder(
-                    gridDelegate:
-                         SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: MediaQuery.of(context).size.width < 600
-                          ? 1
-                          : MediaQuery.of(context).size.width < 900
-                              ? 2
-                              : 3,
-                      crossAxisSpacing: 20,
-                      mainAxisSpacing: 20,
-                      childAspectRatio: 16 / 9,
-                    ),
-                    itemCount: transactionList.length,
-                    shrinkWrap: true,
-                    physics:
-                        const NeverScrollableScrollPhysics(), // Menonaktifkan scrollbar
-                    itemBuilder: (context, index) =>
-                        TransactionItem(transaction: transactionList[index]),
-                  ),
-                ),
+                
               ],
             ),
           ),
-        ],
-      ),
-    );
-  }
-}
-
-class TransactionItem extends StatelessWidget {
-  final Transaction transaction;
-  const TransactionItem({super.key, required this.transaction});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        color: AppColors.lightGrey.withOpacity(0.25),
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Column(
-        children: [
-          Column(
-            children: [
-              Container(
-            padding: const EdgeInsets.only(bottom: 8),
-            decoration: BoxDecoration(
-              border: Border(
-                bottom: BorderSide(
-                  color: AppColors.lightGrey, // Warna border
-                  width: 0.6, // Ketebalan border
-                ),
-              ),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  children: [
-                    HugeIcon(
-                        icon: HugeIcons.strokeRoundedShoppingBag02,
-                        color: AppColors.primary),
-                    const SizedBox(width: 10),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "Shopping",
-                          style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                          ),
+          FutureBuilder(
+            future: TransactionService().getTransactions(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                      return ListTile(
+                          title: Container(
+                        decoration: BoxDecoration(
+                          color: AppColors.lightGrey.withOpacity(0.3),
+                          borderRadius: BorderRadius.circular(5),
                         ),
-                        Text(
-                          transaction.date,
-                          style: const TextStyle(
-                            fontSize: 10,
-                            color: AppColors.grayText,
-                          ),
-                        ),
-                      ],
+                        padding: EdgeInsets.all(84),
+                      ));
+                    },
+                    childCount: 4,
+                  ),
+                );
+              }
+
+              final data = snapshot.data;
+
+              if (data == null || data.isEmpty) {
+                return SliverToBoxAdapter(
+                  child: SizedBox(
+                    height: MediaQuery.of(context).size.height - 200,
+                    child: Center(
+                      child: Text(
+                        'No Transaction Found',
+                      ),
                     ),
-                  ],
-                ),
+                  ),
+                );
+              }
+
+              final transactions = snapshot.data as List<Map<String, dynamic>>;
+
+              if (transactions.isNotEmpty) {
+                return SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                      final transaction =
+                          Transaction.fromJson(transactions[index]);
+                      return ListTile(
+                        title: Container(
+                          padding: const EdgeInsets.all(15),
+                          decoration: BoxDecoration(
+                            color: AppColors.lightGrey.withOpacity(0.3),
+                            borderRadius: BorderRadius.circular(5),
+                          ),
+                          child: Column(
+                            children: [
+                              Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    DateFormat('dd MMMM yyyy')
+                                        .format(transaction.date),
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w400,
+                                      color: AppColors.grayText,
+                                    ),
+                                  ),
                 StatusBadge(status: transaction.status),
               ],
             ),
-          ),
-          const SizedBox(height: 10),
-          Row(
-            children: [
-              Image.asset(
-                transaction.productImage,
-                width: 50,
-                height: 50,
-              ),
-              const SizedBox(width: 20),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                              Divider(
+                                color: AppColors.lightGrey.withOpacity(0.8),
+                                thickness: 1,
+                                height: 20,
+                              ),
+                              Row(
+                                children: [
+                                  Row(
+                                    children: [
+                                      Container(
+                                        width: 45,
+                                        height: 45,
+                                        decoration: BoxDecoration(
+                                          color: Color(int.parse(
+                                              '0xFF${transaction.product.primary_color}')),
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                        ),
+                                        child: Center(
+                                          child: Image.network(
+                                            transaction.product.image ?? '',
+                                            width: 35,
+                                            height: 35,
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(width: 10),
+                                      Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            transaction.product.name ?? "-",
+                                            style: TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                          Text(
+                                            '${transaction.quantity} Pcs',
+                                            style: TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w500,
+                                              color: AppColors.grayText,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  )
+                                ],
+                              ),
+                              SizedBox(height: 10),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    transaction.productName,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
+                                      Text(
+                                        'Total Price',
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          color: AppColors.grayText,
+                                        ),
+                                        textAlign: TextAlign.start,
+                                      ),
+                                      Text(
+                                        '\$ ${transaction.totalPrice}',
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                        textAlign: TextAlign.start,
+                                      ),
+
+                   
+                                    ],
+                                  ),
+                                  if (transaction.status == 'success')
+                                    SizedBox(
+                                      width: 75,
+                                      height: 30,
+                                      child: TextButton(
+                                          onPressed: () {
+                                            showDialog(
+                                                context: context,
+                                                builder: (context) {
+                                                  return AppDialog(
+                                                    title: 'Reorder',
+                                                    message:
+                                                        'Do you want to reorder this product?',
+                                                    cancelText: "Cancel",
+                                                    confirmText: "Reorder",
+                                                    onConfirm: () async {
+                                                      try {
+                                                        final currentUser =
+                                                            supabase.auth
+                                                                .currentUser;
+
+                                                        if (currentUser ==
+                                                            null) {
+                                                          return;
+                                                        }
+
+                                                        final payload = {
+                                                          "product_id":
+                                                              transaction
+                                                                  .product.id,
+                                                          "quantity":
+                                                              transaction
+                                                                  .quantity,
+                                                          "total_price":
+                                                              transaction
+                                                                  .totalPrice,
+                                                          "status": "process",
+                                                          "user_id":
+                                                              currentUser.id,
+                                                        };
+
+                                                        await TransactionService()
+                                                            .addTransaction(
+                                                                [payload]);
+
+                                                        ScaffoldMessenger.of(
+                                                                context)
+                                                            .showSnackBar(
+                                                                SnackBar(
+                                                          content: Text(
+                                                              "Transaction successfully completed!"),
+                                                          backgroundColor:
+                                                              AppColors.primary,
+                                                          duration: Duration(
+                                                              seconds: 2),
+                                                        ));
+
+                                                        setState(() {});
+                                                      } catch (e) {
+                                                        ScaffoldMessenger.of(
+                                                                context)
+                                                            .showSnackBar(
+                                                                SnackBar(
+                                                          content: Text(
+                                                              "Failed to reorder transaction!"),
+                                                          backgroundColor:
+                                                              AppColors
+                                                                  .secondary,
+                                                          duration: Duration(
+                                                              seconds: 2),
+                                                        ));
+                                                      } finally {
+                                                        Navigator.pop(context);
+                                                      }
+                                                    },
+                                                  );
+                                                });
+                                          },
+                                          child: Text(
+                                            'Reorder',
+                                            style: TextStyle(
+                                                color: AppColors.background,
+                                                fontSize: 12),
+                                          ),
+                                          style: ButtonStyle(
+                                            backgroundColor:
+                                                WidgetStatePropertyAll<Color>(
+                                              AppColors.primary,
+                                            ),
+                                            padding:
+                                                const WidgetStatePropertyAll<
+                                                        EdgeInsets>(
+                                                    EdgeInsets.symmetric(
+                                                        horizontal: 5,
+                                                        vertical: 5)),
+                                          )),
+                                    )
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                    childCount: transactions.length,
                   ),
-                  Text(
-                    "${transaction.productQuantity} Pcs",
-                    style: const TextStyle(
-                      fontSize: 12,
-                      color: AppColors.grayText,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-         
-            ],
-          ),
-          Spacer(),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "Total Price",
-                    style: const TextStyle(
-                      fontSize: 10,
-                      fontWeight: FontWeight.w500,
-                      color: AppColors.grayText,
-                    ),
-                  ),
-                  Text(
-                    "\$${transaction.productPrice * transaction.productQuantity}",
-                    style: const TextStyle(
-                      fontSize: 12,
-                      color: AppColors.darkSecondary,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-              if (transaction.status == Status.success)
-                SizedBox(
-                  width: 60,
-                  height: 23,
-                  child: TextButton(
-                    onPressed: () {},
-                    style: TextButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 2,
-                      ),
-                    ),
-                    child: const Text(
-                      "Reorder",
-                      style: TextStyle(
-                        color: AppColors.background,
-                        fontSize: 10,
-                        fontWeight: FontWeight.w500,
-                      ),
+                );
+              }
+
+              return SliverToBoxAdapter(
+                child: SizedBox(
+                  height: MediaQuery.of(context).size.height - 200,
+                  child: Center(
+                    child: Text(
+                      'No Transaction Found',
                     ),
                   ),
                 ),
-              if (transaction.status == Status.process)
-                SizedBox(
-                  width: 50,
-                  height: 23,
-                  child: TextButton(
-                    onPressed: () {},
-                    style: TextButton.styleFrom(
-                      backgroundColor: Colors.amber,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 2,
-                      ),
-                    ),
-                    child: const Text(
-                      "Track",
-                      style: TextStyle(
-                        color: AppColors.background,
-                        fontSize: 10,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                ),
-            ],
-          ),
+              );
+            },
+          )
         ],
       ),
     );
   }
 }
 
+
+
 class StatusBadge extends StatelessWidget {
-  final Status status;
+  final String status;
   const StatusBadge({super.key, required this.status});
 
   @override
@@ -246,22 +327,22 @@ class StatusBadge extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 4),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(5),
-        color: status == Status.success
+        color: status == "success"
             ? AppColors.primary.withOpacity(0.15)
-            : status == Status.canceled
+            : status == "canceled"
                 ? AppColors.secondary.withOpacity(0.1)
                 : AppColors.warning.withOpacity(0.14),
       ),
       child: Text(
-        status == Status.success
+        status == "success"
             ? "Success"
-            : status == Status.canceled
+            : status == "canceled"
                 ? "Canceled"
                 : "Process",
         style: TextStyle(
-            color: status == Status.success
+            color: status == "success"
                 ? AppColors.primary
-                : status == Status.canceled
+                : status == "canceled"
                     ? AppColors.secondary
                     : AppColors.warning,
             fontSize: 10,

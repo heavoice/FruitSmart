@@ -271,6 +271,8 @@ class _ProductItemState extends ConsumerState<ProductItem> {
                                 SnackBar(
                                   content: Text('Something went wrong: $e'),
                                   backgroundColor: Colors.red[600],
+                                  duration: Duration(seconds: 2),
+
                                 ),
                               );
                             } finally {

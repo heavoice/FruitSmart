@@ -20,7 +20,7 @@ class AppButton extends StatelessWidget {
     return ElevatedButton(
       onPressed: isDisabled || isLoading ? null : onPressed,
       style: ElevatedButton.styleFrom(
-        padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
+        padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
         textStyle: const TextStyle(fontSize: 20),
         backgroundColor: AppColors.primary,
         shadowColor: Colors.transparent,

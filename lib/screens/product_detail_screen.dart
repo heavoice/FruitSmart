@@ -331,6 +331,8 @@ class PosisionedButton extends ConsumerWidget {
                               SnackBar(
                                 content: Text('Something went wrong: $e'),
                                 backgroundColor: Colors.red[600],
+                                duration: Duration(seconds: 2),
+
                               ),
                             );
                           } finally {
@@ -395,6 +397,8 @@ class PosisionedButton extends ConsumerWidget {
                                 SnackBar(
                                   content: Text('Product added to cart!'),
                                   backgroundColor: AppColors.primary,
+                                  duration: Duration(seconds: 2),
+
                                 ),
                               );
                             } catch (e) {
@@ -402,6 +406,8 @@ class PosisionedButton extends ConsumerWidget {
                                 SnackBar(
                                   content: Text('Something went wrong: $e'),
                                   backgroundColor: Colors.red[600],
+                                  duration: Duration(seconds: 2),
+
                                 ),
                               );
                             } finally {

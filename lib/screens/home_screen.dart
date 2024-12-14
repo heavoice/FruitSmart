@@ -33,7 +33,11 @@ class HomeScreen extends ConsumerWidget {
         );
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to sign out: $e')),
+          SnackBar(
+            content: Text('Failed to sign out: $e'),
+            duration: Duration(seconds: 2),
+          ),
+          
         );
       }
     }
@@ -56,12 +60,13 @@ class HomeScreen extends ConsumerWidget {
                           },
                           child: CircleAvatar(
                             radius: 30,
-                            backgroundColor: Colors.grey[200],
-                              child: const Icon(
-                                    Icons.person_add_alt_1,
-                                    size: 30,
-                                    color: Colors.grey,
-                                  )
+                              backgroundColor:
+                                  AppColors.lightGrey.withOpacity(0.4),
+                              child: HugeIcon(
+                                icon: HugeIcons.strokeRoundedUser,
+                                color: AppColors.grayText,
+                                size: 24.0,
+                              )
                                 
                           ),
                         ),
@@ -503,6 +508,8 @@ class _BestSellingCardState extends ConsumerState<BestSellingCard> {
                                 SnackBar(
                                   content: Text('Something went wrong: $e'),
                                   backgroundColor: Colors.red[600],
+                                  duration: Duration(seconds: 2),
+
                                 ),
                               );
                             } finally {

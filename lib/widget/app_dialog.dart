@@ -56,7 +56,7 @@ class _AppDialogState extends State<AppDialog> {
                   child: TextButton(
                     style: TextButton.styleFrom(
                       foregroundColor: AppColors.background,
-                      backgroundColor: AppColors.primary,
+                      backgroundColor: AppColors.primary.withOpacity(0.08),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
@@ -67,7 +67,7 @@ class _AppDialogState extends State<AppDialog> {
                     child: Text(
                       widget.cancelText,
                       style: TextStyle(
-                        color: Colors.white,
+                        color: AppColors.primary,
                         fontSize: 14,
                       ),
                     ),
@@ -82,8 +82,8 @@ class _AppDialogState extends State<AppDialog> {
                   height: 35,
                   child: TextButton(
                     style: TextButton.styleFrom(
-                      foregroundColor: Colors.red.shade100,
-                      backgroundColor: Colors.red,
+                      foregroundColor: AppColors.background,
+                      backgroundColor: AppColors.primary,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),

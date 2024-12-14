@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:smart_shop_app/config/theme/app_colors.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:smart_shop_app/main.dart';
 import 'package:smart_shop_app/service/cart/cart_service.dart';
+import 'package:smart_shop_app/service/transaction/transaction_service.dart';
 import 'package:smart_shop_app/widget/app_dialog.dart';
 
 class CartScreen extends ConsumerWidget {
@@ -20,7 +22,6 @@ class CartScreen extends ConsumerWidget {
       body: StreamBuilder(
         stream: CartService().getCartItems(),
         builder: (context, snapshot) {
-
           if (!snapshot.hasData ||
               snapshot.data.isEmpty ||
               snapshot.connectionState == ConnectionState.waiting) {
@@ -63,7 +64,7 @@ class CartScreen extends ConsumerWidget {
                         ),
                       );
                     },
-                    childCount: 1,
+                    childCount: 4,
                   ),
                 )
               else
@@ -78,7 +79,6 @@ class CartScreen extends ConsumerWidget {
                   ),
                 ),
             ]);
-
           }
 
           // Extract cart data
@@ -114,23 +114,26 @@ class CartScreen extends ConsumerWidget {
                     elevation: 0,
                     pinned: false,
                   ),
-                  SliverList(
-                    delegate: SliverChildBuilderDelegate(
-                      (context, index) {
-                        return ListTile(
-                          title: Container(
-                            decoration: BoxDecoration(
-                              color: AppColors.lightGrey.withOpacity(0.3),
-                              borderRadius: BorderRadius.circular(5),
+                  SliverPadding(
+                    padding: const EdgeInsets.only(bottom: 100),
+                    sliver: SliverList(
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) {
+                          return ListTile(
+                            title: Container(
+                              decoration: BoxDecoration(
+                                color: AppColors.lightGrey.withOpacity(0.3),
+                                borderRadius: BorderRadius.circular(5),
+                              ),
+                              padding: EdgeInsets.all(20),
+                              child: CartItem(
+                                cartItem: Cart.fromMap(cartItems[index]),
+                              ),
                             ),
-                            padding: EdgeInsets.all(20),
-                            child: CartItem(
-                              cartItem: Cart.fromMap(cartItems[index]),
-                            ),
-                          ),
-                        );
-                      },
-                      childCount: cartItems.length,
+                          );
+                        },
+                        childCount: cartItems.length,
+                      ),
                     ),
                   ),
                 ],
@@ -169,9 +172,63 @@ class CartScreen extends ConsumerWidget {
                         ],
                       ),
                       TextButton(
-                        onPressed: () {
-                          // Checkout Action
-                          Navigator.pushNamed(context, '/checkout');
+                        onPressed: () async {
+                          showDialog(
+                              context: context,
+                              builder: (context) {
+                                return AppDialog(
+                                  title: "Checkout",
+                                  message: "Are you sure want to checkout?",
+                                  onConfirm: () async {
+                                    try {
+                                      final currentUser =
+                                          supabase.auth.currentUser;
+
+                                      if (currentUser == null) {
+                                        return;
+                                      }
+
+                                      final payload = cartItems.map((item) {
+                                        return {
+                                          "product_id": item["product_id"],
+                                          "quantity": item["quantity"],
+                                          "total_price": item["product_price"] *
+                                              item["quantity"],
+                                          "status": "process",
+                                          "user_id": currentUser.id,
+                                        };
+                                      }).toList();
+
+                                      final res = await TransactionService()
+                                          .addTransaction(payload);
+
+                                      if (res) {
+                                        await CartService().clearCart();
+
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(SnackBar(
+                                          content: Text(
+                                              "Transaction successfully completed!"),
+                                          backgroundColor: AppColors.primary,
+                                          duration: Duration(seconds: 2),
+                                        ));
+                                      }
+                                    } catch (e) {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(SnackBar(
+                                        content: Text(
+                                            "Failed to complete transaction!"),
+                                        backgroundColor: Colors.red,
+                                        duration: Duration(seconds: 2),
+                                      ));
+                                    } finally {
+                                      Navigator.pop(context);
+                                    }
+                                  },
+                                  cancelText: "Cancel",
+                                  confirmText: "Checkout",
+                                );
+                              });
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.primary,
