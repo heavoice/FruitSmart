@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:smart_shop_app/config/theme/app_colors.dart';
+import 'package:smart_shop_app/provider/quantity_provider.dart';
 import 'package:smart_shop_app/service/products/products.dart';
 import 'package:smart_shop_app/service/wishlist/wishlist_service.dart';
 
@@ -158,22 +160,25 @@ class _ProductListState extends State<ProductListScreen> {
   }
 }
 
-class ProductItem extends StatefulWidget {
+class ProductItem extends ConsumerStatefulWidget {
   final ProductData product;
   const ProductItem({super.key, required this.product});
 
   @override
-  State<ProductItem> createState() => _ProductItemState();
+  ConsumerState<ProductItem> createState() => _ProductItemState();
 }
 
-class _ProductItemState extends State<ProductItem> {
+class _ProductItemState extends ConsumerState<ProductItem> {
   @override
   Widget build(BuildContext context) {
     final isInWishlist = WishlistService().isInWishlist(widget.product.id);
     bool isLoading = false;
+    final quantityNotifier = ref.read(quantityProvider.notifier);
+
 
     return GestureDetector(
       onTap: () {
+        quantityNotifier.state = 1;
         Navigator.pushNamed(
           context,
           '/detail',
@@ -242,26 +247,38 @@ class _ProductItemState extends State<ProductItem> {
                       future: isInWishlist,
                       builder: (context, snapshot) {
                         return TextButton(
-                          onPressed: () {
-                            if (snapshot.connectionState ==
-                                    ConnectionState.done &&
-                                isLoading == false) {
-                              setState(() {
-                                isLoading = true;
-                              });
-                              if (snapshot.data == true) {
-                                WishlistService()
-                                    .removeWishlist(widget.product.id);
+                          onPressed: () async {
+                            try {
+                              if (snapshot.connectionState ==
+                                      ConnectionState.done &&
+                                  isLoading == false) {
+                                setState(() {
+                                  isLoading = true;
+                                });
+                                if (snapshot.data == true) {
+                                  await WishlistService()
+                                      .removeWishlist(widget.product.id);
+                                } else {
+                                  await WishlistService()
+                                      .addWishlist(widget.product.id);
+                                }
                               } else {
-                                WishlistService()
-                                    .addWishlist(widget.product.id);
+                                setState(() {});
+                                return null;
                               }
+                            } catch (e) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('Something went wrong: $e'),
+                                  backgroundColor: Colors.red[600],
+                                  duration: Duration(seconds: 2),
+
+                                ),
+                              );
+                            } finally {
                               setState(() {
                                 isLoading = false;
                               });
-                            } else {
-                              setState(() {});
-                              return null;
                             }
                           },
                           style: TextButton.styleFrom(

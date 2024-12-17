@@ -2,17 +2,27 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:smart_shop_app/config/theme/app_colors.dart';
+import 'package:smart_shop_app/provider/loading_provider.dart';
 import 'package:smart_shop_app/provider/navprovider.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:smart_shop_app/provider/quantity_provider.dart';
+import 'package:smart_shop_app/provider/wishlist_provider.dart';
+import 'package:smart_shop_app/service/cart/cart_service.dart';
 import 'package:smart_shop_app/service/products/products.dart';
 import 'package:smart_shop_app/service/wishlist/wishlist_service.dart';
 
-class ProductDetailScreen extends ConsumerWidget {
+class ProductDetailScreen extends ConsumerStatefulWidget {
   const ProductDetailScreen({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ProductDetailScreen> createState() =>
+      _ProductDetailScreenState();
+}
+
+class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
+
+  @override
+  Widget build(BuildContext context) {
     final productId = ModalRoute.of(context)!.settings.arguments as int?;
     final ProductsService productsService = ProductsService();
     final quantityNotifier = ref.read(quantityProvider.notifier);
@@ -275,18 +285,15 @@ class ProductDetailScreen extends ConsumerWidget {
   }
 }
 
-class PosisionedButton extends StatefulWidget {
+class PosisionedButton extends ConsumerWidget {
   const PosisionedButton({Key? key, required this.product}) : super(key: key);
   final ProductData product;
-  @override
-  _PosisionedButtonState createState() => _PosisionedButtonState();
-}
 
-class _PosisionedButtonState extends State<PosisionedButton> {
   @override
-  Widget build(BuildContext context) {
-    final isInWishlist = WishlistService().isInWishlist(widget.product.id);
-    bool isLoading = false;
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isWishlistLoading = ref.watch(wishlistLoadingProvider);
+    final isCartLoading = ref.watch(cartLoadingProvider);
+    final isInWishlist = ref.watch(wishlistProvider(product.id as int));
 
     return Positioned(
       bottom: 0,
@@ -298,89 +305,140 @@ class _PosisionedButtonState extends State<PosisionedButton> {
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
           child: Row(
             children: [
+              // Wishlist Button
               SizedBox(
                 width: 52,
                 height: 52,
-                child: FutureBuilder(
-                  future: isInWishlist,
-                  builder: (context, snapshot) {
-                    return TextButton(
-                      onPressed: () {
-                        if (snapshot.connectionState == ConnectionState.done &&
-                            isLoading == false) {
-                          setState(() {
-                            isLoading = true;
-                          });
-                          if (snapshot.data == true) {
-                            WishlistService().removeWishlist(widget.product.id);
-                          } else {
-                            WishlistService().addWishlist(widget.product.id);
+                child: TextButton(
+                  onPressed: isWishlistLoading
+                      ? null
+                      : () async {
+                          ref.read(wishlistLoadingProvider.notifier).start();
+
+                          try {
+                            if (isInWishlist.value == true) {
+                              await WishlistService()
+                                  .removeWishlist(product.id);
+                            } else {
+                              await WishlistService().addWishlist(product.id);
+                            }
+
+                            // Refresh wishlist provider
+                            // ignore: unused_result
+                            ref.refresh(wishlistProvider(product.id as int));
+                          } catch (e) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Something went wrong: $e'),
+                                backgroundColor: Colors.red[600],
+                                duration: Duration(seconds: 2),
+
+                              ),
+                            );
+                          } finally {
+                            ref.read(wishlistLoadingProvider.notifier).stop();
                           }
-                          setState(() {
-                            isLoading = false;
-                          });
-                        } else {
-                          setState(() {});
-                          return null;
-                        }
-                      },
-                      style: TextButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          side: BorderSide(
-                            width: 2,
-                            color: Color(int.parse(
-                                '0xFF${widget.product.secondary_color}')),
-                          ),
+                        },
+                  style: TextButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    splashFactory: NoSplash.splashFactory,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      side: BorderSide(
+                        width: 2,
+                        color: Color(
+                          int.parse('0xFF${product.secondary_color}'),
                         ),
                       ),
-                      child:
-                          snapshot.connectionState == ConnectionState.waiting ||
-                                  isLoading
-                              ? SizedBox(
-                                  width: 22,
-                                  height: 22,
-                                  child: CircularProgressIndicator(
-                                    color: Color(int.parse(
-                                        '0xFF${widget.product.secondary_color}')),
-                                    strokeWidth: 3,
-                                  ),
-                                )
-                              : Icon(
-                                  snapshot.data == true
-                                      ? CupertinoIcons.heart_fill
-                                      : CupertinoIcons.heart,
-                                  color: Color(int.parse(
-                                      '0xFF${widget.product.secondary_color}')),
-                                  size: 22,
-                                ),
-                    );
-                  },
+                    ),
+                  ),
+                  child: isWishlistLoading || isInWishlist.isLoading
+                      ? SizedBox(
+                          width: 22,
+                          height: 22,
+                          child: CircularProgressIndicator(
+                            color: Color(
+                              int.parse('0xFF${product.secondary_color}'),
+                            ),
+                            strokeWidth: 3,
+                          ),
+                        )
+                      : Icon(
+                          isInWishlist.value == true
+                              ? CupertinoIcons.heart_fill
+                              : CupertinoIcons.heart,
+                          color: Color(
+                            int.parse('0xFF${product.secondary_color}'),
+                          ),
+                          size: 22,
+                        ),
                 ),
               ),
+
               const SizedBox(width: 20),
+
+              // Add to Cart Button
               Expanded(
                 child: SizedBox(
                   height: 52,
                   child: TextButton(
-                    onPressed: () {},
+                    onPressed: isCartLoading
+                        ? null
+                        : () async {
+                            ref.read(cartLoadingProvider.notifier).start();
+
+                            try {
+                              await CartService().addToCart(
+                                product,
+                                ref.read(quantityProvider),
+                              );
+
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('Product added to cart!'),
+                                  backgroundColor: AppColors.primary,
+                                  duration: Duration(seconds: 2),
+
+                                ),
+                              );
+                            } catch (e) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('Something went wrong: $e'),
+                                  backgroundColor: Colors.red[600],
+                                  duration: Duration(seconds: 2),
+
+                                ),
+                              );
+                            } finally {
+                              ref.read(cartLoadingProvider.notifier).stop();
+                            }
+                          },
                     style: TextButton.styleFrom(
                       backgroundColor: Color(
-                        int.parse('0xFF${widget.product.secondary_color}'),
-                      ),
+                        int.parse('0xFF${product.secondary_color}'),
+                      ).withOpacity(isCartLoading ? 0.5 : 1.0),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                    child: Text(
-                      "Add to cart",
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
+                    child: isCartLoading
+                        ? SizedBox(
+                            width: 22,
+                            height: 22,
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 3,
+                            ),
+                          )
+                        : Text(
+                            'Add to Cart',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                   ),
                 ),
               ),

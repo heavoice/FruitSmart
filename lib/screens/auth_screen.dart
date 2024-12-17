@@ -1,6 +1,5 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:smart_shop_app/config/images/app_images.dart';
 import 'package:smart_shop_app/config/theme/app_colors.dart';
 import 'package:smart_shop_app/screens/main_screen.dart';
 import 'package:smart_shop_app/service/user/user.dart';
@@ -83,6 +82,8 @@ class _AuthScreenState extends State<AuthScreen> {
         SnackBar(
           content: Text(error.message),
           backgroundColor: Colors.red[600],
+          duration: Duration(seconds: 2),
+
         ),
       );
     } catch (e) {
@@ -91,6 +92,8 @@ class _AuthScreenState extends State<AuthScreen> {
         SnackBar(
           content: Text('Something went wrong: $e'),
           backgroundColor: Colors.red[600],
+          duration: Duration(seconds: 2),
+
         ),
       );
     } finally {
@@ -376,48 +379,7 @@ class _AuthScreenState extends State<AuthScreen> {
                     title: _isLogin ? 'Sign In' : 'Register',
                   ),
                 ),
-                const SizedBox(height: 10),
-                const Text(
-                  "Or",
-                  style: TextStyle(
-                    color: AppColors.grayText,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                const SizedBox(height: 10),
-                SizedBox(
-                  width: double.infinity,
-                  child: TextButton(
-                    style: TextButton.styleFrom(
-                      backgroundColor: AppColors.lightGrey.withOpacity(0.5),
-                      padding: const EdgeInsets.symmetric(vertical: 20),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                    ),
-                    onPressed: _submit,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Image.asset(
-                          AppImages.google,
-                          width: 20,
-                          height: 20,
-                        ),
-                        const SizedBox(width: 20),
-                        const Text(
-                          "Sign in with Google",
-                          style: TextStyle(
-                            color: AppColors.darkSecondary,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
+             
                 const SizedBox(height: 20),
                 Center(
                   child: RichText(

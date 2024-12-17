@@ -26,8 +26,10 @@ class _CategoryScreenState extends State<CategoryScreen> {
           automaticallyImplyLeading: false,
           backgroundColor: Colors.transparent,
           toolbarHeight: 80,
-          title: const CustomAppBar(
-            route: "/main",
+          title: CustomAppBar(
+            onTap: () {
+              Navigator.pushNamed(context, "/main");
+            },
           ),
           surfaceTintColor: Colors.transparent,
         ),
@@ -150,16 +152,16 @@ class CategoryItem extends StatelessWidget {
               ],
             ),
           ),
-          SizedBox(
-            height: 20,
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 10),
-            child: Image.network(
-              category.thumbnail_url ?? "-",
-              fit: BoxFit.contain,
-              width: 90,
-              height: 90,
+          
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 10),
+              child: Image.network(
+                category.thumbnail_url ?? "-",
+                fit: BoxFit.contain,
+                width: 90,
+                height: 90,
+              ),
             ),
           ),
         ]),
@@ -172,10 +174,10 @@ class CustomAppBar extends ConsumerWidget {
   const CustomAppBar({
     super.key,
     this.title,
-    required this.route,
+    required this.onTap,
   });
   final title;
-  final String route;
+  final Function onTap;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -186,7 +188,7 @@ class CustomAppBar extends ConsumerWidget {
         children: [
           GestureDetector(
             onTap: () {
-              Navigator.pushNamed(context, route);
+              onTap();
             },
             child: Container(
               width: 40,

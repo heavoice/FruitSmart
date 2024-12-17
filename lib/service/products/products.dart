@@ -27,6 +27,7 @@ class ProductsService {
     return response;
   }
 
+
   Future<Map<String, dynamic>> getProductById(int id) async {
     final response = await Supabase.instance.client
         .from("products")

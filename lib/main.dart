@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:smart_shop_app/config/theme/app_theme.dart';
 import 'package:smart_shop_app/screens/auth_screen.dart';
 import 'package:smart_shop_app/screens/category_screen.dart';
@@ -16,10 +15,6 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  await dotenv.load(
-    fileName: ".env",
-  );
 
   await Supabase.initialize(
     url: "https://giklwkgxdezeqlzbohxf.supabase.co",
