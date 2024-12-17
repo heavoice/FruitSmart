@@ -58,11 +58,15 @@ class HomeScreen extends ConsumerWidget {
                             Navigator.pushNamed(context, 'profile');
                           },
                           child: CircleAvatar(
+                            
                             radius: 30,
                             backgroundColor: Colors.grey[200],
                             child: profileImageAsyncValue.when(
                               loading: () =>
-                                  const CircularProgressIndicator(), // Show a loading spinner
+                                  const CircularProgressIndicator(
+                                color: AppColors.primary,
+                                strokeWidth: 2,
+                              ), // Show a loading spinner
                               error: (error, stackTrace) => const Icon(
                                 // Show an error icon if the image fetch fails
                                 Icons.error,
@@ -78,12 +82,10 @@ class HomeScreen extends ConsumerWidget {
                                         backgroundImage:
                                             NetworkImage(profileImageUrl),
                                       )
-                                    : const Icon(
-                                        // Fallback to default icon if no image URL is found
-                                        Icons.person_add_alt_1,
-                                        size: 30,
-                                        color: Colors.grey,
-                                      );
+                                    : HugeIcon(
+                                        icon: HugeIcons.strokeRoundedUser,
+                                        color: AppColors.grayText,
+                                        size: 30.0);
                               },
                             ),
                           ),
@@ -484,16 +486,8 @@ class _BestSellingCardState extends ConsumerState<BestSellingCard> {
               Padding(
                 padding: const EdgeInsets.only(left: 20),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    Text(
-                      "${widget.product.totalSold} Sold",
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
                     FutureBuilder(
                       future: isInWishlist,
                       builder: (context, snapshot) {

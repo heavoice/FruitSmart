@@ -22,7 +22,6 @@ class _AuthScreenState extends State<AuthScreen> {
   bool _isEmailTouched = false;
   bool _isPasswordTouched = false;
   bool _isUsernameTouched = false;
-  String? _profileImageUrl;
   final _formKey = GlobalKey<FormState>();
   final _focusNode = FocusNode();
   bool _isLogin = true;
@@ -216,24 +215,6 @@ class _AuthScreenState extends State<AuthScreen> {
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              GestureDetector(
-                                onTap: null,
-                                child: CircleAvatar(
-                                  radius: 50,
-                                  backgroundColor: Colors.grey[300],
-                                  child: _profileImageUrl == null
-                                      ? Icon(
-                                          Icons.add_a_photo,
-                                          color: Colors.white,
-                                          size: 30,
-                                        )
-                                      : null,
-                                  backgroundImage: _profileImageUrl == null
-                                      ? null
-                                      : NetworkImage(_profileImageUrl!)
-                                          as ImageProvider,
-                                ),
-                              ),
                               const Text(
                                 "Username",
                                 style: TextStyle(

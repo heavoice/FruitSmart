@@ -233,16 +233,8 @@ class _ProductItemState extends ConsumerState<ProductItem> {
               Padding(
                 padding: const EdgeInsets.only(left: 20),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    Text(
-                      "${widget.product.totalSold} Sold",
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
                     FutureBuilder(
                       future: isInWishlist,
                       builder: (context, snapshot) {

@@ -214,7 +214,9 @@ class CustomAppBar extends ConsumerWidget {
               fontWeight: FontWeight.bold,
             ),
           ),
-          SizedBox()
+          SizedBox(
+            width: 20,
+          )
         ],
       ),
     );
